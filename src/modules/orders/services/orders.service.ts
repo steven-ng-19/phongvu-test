@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ORDER_MODEL, OrderItem } from '../models';
 import { Model } from 'mongoose';
 import { ProductDocument } from 'src/modules/products/entities';
-import { StripeService } from 'src/modules/stripe/services';
+import { StripeService } from 'src/shared/stripe/services';
 import { CreateOrderDto } from '../dto';
 import { OrderDocument } from '../entities';
 import { User } from 'src/modules/users/models';

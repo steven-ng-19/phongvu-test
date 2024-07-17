@@ -23,10 +23,8 @@ export class AuthController {
   async register(
     @Body(new ZodValidationPipe(RegisterValidator)) data: RegisterDto,
   ) {
-    const result =
-      await this._authService.register<ResponseTypeGeneric<User>>(data);
-    const { data: _, ...response } = result;
-    return response;
+    const result = await this._authService.register(data);
+    return result;
   }
 
   @UseGuards(LocalAuthGuard)

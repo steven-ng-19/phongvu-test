@@ -1,6 +1,6 @@
 import { CreateAddressValidator } from './create-address.dto';
 import { z } from 'zod';
 
-export const UpdateAddressSchema = CreateAddressValidator.partial().strict();
+export const UpdateAddressValidator = CreateAddressValidator.partial().strict();
 
-export type UpdateAddressDto = z.infer<typeof UpdateAddressSchema>;
+export type UpdateAddressDto = z.infer<typeof UpdateAddressValidator>;

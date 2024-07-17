@@ -7,7 +7,6 @@ import { Address } from '../../users/models';
 import { USER_MODEL } from '../../users/models/user.schema';
 
 export const ORDER_MODEL = 'Order';
-export type OrderDocument = Order & Document;
 
 @Schema({ timestamps: { createdAt: true, updatedAt: true } })
 export class Order {

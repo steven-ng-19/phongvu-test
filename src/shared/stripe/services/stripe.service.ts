@@ -2,7 +2,7 @@ import { CONFIG_VAR } from 'src/config';
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
-import { User } from '../../users/models/user.schema';
+import { User } from '../../../modules/users/models/user.schema';
 
 @Injectable()
 export class StripeService {

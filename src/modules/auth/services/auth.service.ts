@@ -24,14 +24,17 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async register<T>(data: RegisterDto): Promise<ResponseTypeGeneric<T>> {
+  async register(data: RegisterDto) {
     const { email } = data;
-    const existUser = await this._userService.findOne<User>({ email: email });
-    if (existUser) throw new BadRequestException('User already exists');
 
-    const result: ResponseTypeGeneric<T> =
-      await this._userService.createUser<T>(data);
-    return result;
+    // Check if user with the same email or phone exists
+    const existUser = await this._userService.findUser(email);
+    if (existUser) throw new Error('User already exists');
+
+    // Create user
+    await this._userService.createUser(data);
+
+    // TODO: Send verification email
   }
 
   async validateUser(username: string, password: string): Promise<User> {
@@ -87,7 +90,7 @@ export class AuthService {
     });
 
     const { userId } = payload;
-    const user = await this._userService.findOne<User>({ _id: userId });
+    const user = await this._userService.findOne({ _id: userId });
     if (!user) throw new UnauthorizedException('Invalid token');
 
     return this.login(user);
@@ -116,7 +119,7 @@ export class AuthService {
   async resetPassword(data: ResetPasswordDto) {
     const { token, newPassword: password } = data;
     // Check if reset password token exists
-    const user = await this._userService.findOne<User>({
+    const user = await this._userService.findOne({
       resetPasswordToken: token,
     });
     if (!user) throw new Error('Invalid token');

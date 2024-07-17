@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { FirebaseModule } from './shared/firebase/firebase.module';
 import { MediaModule } from './modules/medias/media.module';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -15,8 +16,10 @@ import { ProductsModule } from './modules/products/products.module';
 import { PromotionModule } from './modules/promotions/promotions.module';
 import { ResponseTransformInterceptor } from './common/interceptors';
 import { S3Module } from './shared/s3/s3.module';
-import { StripeModule } from './modules/stripe/stripe.module';
+import { SendGridModule } from './shared/mail/mail.module';
+import { StripeModule } from './shared/stripe/stripe.module';
 import { UsersModule } from './modules/users/users.module';
+import { WishlistModule } from './modules/wishlist/wishlist.module';
 
 @Module({
   imports: [
@@ -44,6 +47,9 @@ import { UsersModule } from './modules/users/users.module';
     PromotionModule,
     S3Module,
     MediaModule,
+    WishlistModule,
+    SendGridModule,
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [
