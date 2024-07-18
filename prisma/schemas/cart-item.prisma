@@ -1,0 +1,12 @@
+model CartItem {
+    id        String @id @default(uuid()) @db.VarChar(36)
+    userId    String @map("user_id") @db.VarChar(36)
+    productId String @map("product_id") @db.VarChar(36)
+
+    quantity Int @default(1)
+
+    user    User    @relation(fields: [userId], references: [id])
+    product Product @relation(fields: [productId], references: [id])
+
+    @@map("cart_items")
+}

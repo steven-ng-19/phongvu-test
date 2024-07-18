@@ -1,0 +1,19 @@
+model Address {
+    id     String @id @default(uuid()) @db.VarChar(36)
+    userId String @map("user_id") @db.VarChar(36)
+
+    fullName  String  @map("full_name") @db.VarChar(100)
+    phone     String  @db.VarChar(20)
+    address   String  @db.VarChar(50)
+    ward      String  @db.VarChar(50)
+    district  String  @db.VarChar(50)
+    city      String  @db.VarChar(50)
+    country   String  @db.VarChar(50)
+    latitude  Int?
+    longitude Int?
+    isDefault Boolean @default(false) @map("is_default")
+
+    user User @relation(fields: [userId], references: [id])
+
+    @@map("addresses")
+}

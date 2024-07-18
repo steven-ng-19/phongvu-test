@@ -1,0 +1,14 @@
+model Gift {
+    id        String @id @default(uuid()) @db.VarChar(36)
+    benefitId String @db.VarChar(36)
+
+    sku                 String @db.VarChar(255)
+    name                String @db.VarChar(50)
+    image               String @db.VarChar(100)
+    quantity            Int
+    maxQuantityPerOrder Int    @default(1) @map("max_quantity_per_order")
+
+    benefit Benefit @relation(fields: [benefitId], references: [id])
+
+    @@map("gifts")
+}

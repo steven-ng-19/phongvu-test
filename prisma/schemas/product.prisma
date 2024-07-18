@@ -1,0 +1,21 @@
+model Product {
+    id         String @id @default(uuid()) @db.VarChar(36)
+    categoryId String @db.VarChar(36)
+
+    name        String    @db.VarChar(50)
+    slug        String    @db.VarChar(255)
+    description String    @db.Text
+    sku         String    @db.VarChar(255)
+    price       Float     @default(0)
+    quantity    Int       @default(0)
+    image       String    @db.Text
+    discount    Int?      @default(0)
+    deletedAt   DateTime?
+
+    category   Category    @relation(fields: [categoryId], references: [id])
+    galleries  Gallery[]
+    orderItems OrderItem[]
+    cartItems  CartItem[]
+
+    @@map("products")
+}

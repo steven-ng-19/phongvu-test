@@ -1,0 +1,12 @@
+model Discount {
+    id String @id @default(uuid()) @db.VarChar(36)
+
+    percent           Int
+    maxAmount         Float
+    flat              Int?
+    maxAmountPerOrder Float @map("max_amount_per_order")
+
+    benefit Benefit?
+
+    @@map("discounts")
+}

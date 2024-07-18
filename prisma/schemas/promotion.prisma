@@ -1,0 +1,17 @@
+model Promotion {
+    id          String @id @default(uuid()) @db.VarChar(36)
+    conditionId String @unique() @map("condition_id") @db.VarChar(36)
+    benefitId   String @unique() @map("benefit_id") @db.VarChar(36)
+
+    name        String   @db.VarChar(255)
+    description String   @db.Text
+    image       String   @db.VarChar(100)
+    endDate     DateTime @map("end_date")
+    isDefault   Boolean  @default(false)
+    applyOn     String?  @map("apply_on")
+
+    condition Condition @relation(fields: [conditionId], references: [id])
+    benefit   Benefit   @relation(fields: [benefitId], references: [id])
+
+    @@map("promotions")
+}

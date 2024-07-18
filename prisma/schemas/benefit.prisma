@@ -1,0 +1,9 @@
+model Benefit {
+    id         String @id @default(uuid()) @db.VarChar(36)
+    discountId String @unique @map("discount_id") @db.VarChar(36)
+
+    discount Discount @relation(fields: [discountId], references: [id])
+    gifts    Gift[]
+
+    @@map("benefits")
+}

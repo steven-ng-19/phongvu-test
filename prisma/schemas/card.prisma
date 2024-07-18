@@ -1,0 +1,12 @@
+model Card {
+    id     String @id @default(uuid()) @db.VarChar(36)
+    userId String @map("user_id") @db.VarChar(36)
+
+    pm        String  @db.VarChar(255)
+    type      String
+    isDefault Boolean @default(false) @map("is_default")
+
+    user User @relation(fields: [userId], references: [id])
+
+    @@map("cards")
+}

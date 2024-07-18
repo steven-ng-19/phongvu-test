@@ -1,0 +1,240 @@
+//******** AUTO GENERATED FILE, DO NOT EDIT.  *********
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Address {
+  id     String @id @default(uuid()) @db.VarChar(36)
+  userId String @map("user_id") @db.VarChar(36)
+
+  fullName  String  @map("full_name") @db.VarChar(100)
+  phone     String  @db.VarChar(20)
+  address   String  @db.VarChar(50)
+  ward      String  @db.VarChar(50)
+  district  String  @db.VarChar(50)
+  city      String  @db.VarChar(50)
+  country   String  @db.VarChar(50)
+  latitude  Int?
+  longitude Int?
+  isDefault Boolean @default(false) @map("is_default")
+
+  user  User    @relation(fields: [userId], references: [id])
+  Order Order[]
+
+  @@map("addresses")
+}
+
+model Benefit {
+  id         String @id @default(uuid()) @db.VarChar(36)
+  discountId String @unique @map("discount_id") @db.VarChar(36)
+
+  discount  Discount   @relation(fields: [discountId], references: [id])
+  gifts     Gift[]
+  Promotion Promotion?
+
+  @@map("benefits")
+}
+
+model Card {
+  id     String @id @default(uuid()) @db.VarChar(36)
+  userId String @map("user_id") @db.VarChar(36)
+
+  pm        String  @db.VarChar(255)
+  type      String
+  isDefault Boolean @default(false) @map("is_default")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("cards")
+}
+
+model CartItem {
+  id        String @id @default(uuid()) @db.VarChar(36)
+  userId    String @map("user_id") @db.VarChar(36)
+  productId String @map("product_id") @db.VarChar(36)
+
+  quantity Int @default(1)
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("cart_items")
+}
+
+model Category {
+  id           String  @id @default(uuid()) @db.VarChar(36)
+  name         String  @db.VarChar(50)
+  slug         String  @db.VarChar(255)
+  description  String  @db.Text
+  image        String  @db.VarChar(100)
+  isDeprecated Boolean @default(false)
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Condition {
+  id String @id @default(uuid()) @db.VarChar(36)
+
+  orderValueMin Float @map("order_value_min")
+  orderValueMax Float @map("order_value_max")
+  minQuantity   Int   @default(1) @map("min_quantity")
+
+  promotion Promotion?
+
+  @@map("conditions")
+}
+
+model Discount {
+  id String @id @default(uuid()) @db.VarChar(36)
+
+  percent           Int
+  maxAmount         Float
+  flat              Int?
+  maxAmountPerOrder Float @map("max_amount_per_order")
+
+  benefit Benefit?
+
+  @@map("discounts")
+}
+
+model Gallery {
+  id        String @id @default(uuid()) @db.VarChar(36)
+  productId String @db.VarChar(36)
+
+  label String? @db.VarChar(50)
+  url   String  @db.Text
+  type  String?
+  order Int     @default(0)
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("galleries")
+}
+
+model Gift {
+  id        String @id @default(uuid()) @db.VarChar(36)
+  benefitId String @db.VarChar(36)
+
+  sku                 String @db.VarChar(255)
+  name                String @db.VarChar(50)
+  image               String @db.VarChar(100)
+  quantity            Int
+  maxQuantityPerOrder Int    @default(1) @map("max_quantity_per_order")
+
+  benefit Benefit @relation(fields: [benefitId], references: [id])
+
+  @@map("gifts")
+}
+
+model OrderItem {
+  orderId   String @map("order_id") @db.VarChar(36)
+  productId String @map("product_id") @db.VarChar(36)
+
+  productData            Json   @map("product_data")
+  quantity               Int
+  discount               Float?
+  totalPrice             Float  @map("total_price")
+  totalPriceWithDiscount Float? @map("total_price_with_discount")
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@id([orderId, productId])
+  @@map("order_items")
+}
+
+model Order {
+  id        String @id @default(uuid()) @db.VarChar(36)
+  userId    String @db.VarChar(36)
+  addressId String @db.VarChar(36)
+
+  status         String  @db.VarChar(20)
+  totalPrice     Float   @map("total_price")
+  paymentMethod  String  @map("payment_method") @db.VarChar(20)
+  paymentId      String? @map("payment_id") @db.VarChar(255)
+  paymentDetails Json?
+  notes          String  @db.VarChar(255)
+
+  user       User        @relation(fields: [userId], references: [id])
+  address    Address     @relation(fields: [addressId], references: [id])
+  orderItems OrderItem[]
+
+  @@map("orders")
+}
+
+model Product {
+  id         String @id @default(uuid()) @db.VarChar(36)
+  categoryId String @db.VarChar(36)
+
+  name        String    @db.VarChar(50)
+  slug        String    @db.VarChar(255)
+  description String    @db.Text
+  sku         String    @db.VarChar(255)
+  price       Float     @default(0)
+  quantity    Int       @default(0)
+  image       String    @db.Text
+  discount    Int?      @default(0)
+  deletedAt   DateTime?
+
+  category   Category    @relation(fields: [categoryId], references: [id])
+  galleries  Gallery[]
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+
+  @@map("products")
+}
+
+model Promotion {
+  id          String @id @default(uuid()) @db.VarChar(36)
+  conditionId String @unique() @map("condition_id") @db.VarChar(36)
+  benefitId   String @unique() @map("benefit_id") @db.VarChar(36)
+
+  name        String   @db.VarChar(255)
+  description String   @db.Text
+  image       String   @db.VarChar(100)
+  endDate     DateTime @map("end_date")
+  isDefault   Boolean  @default(false)
+  applyOn     String?  @map("apply_on")
+
+  condition Condition @relation(fields: [conditionId], references: [id])
+  benefit   Benefit   @relation(fields: [benefitId], references: [id])
+
+  @@map("promotions")
+}
+
+model User {
+  id String @id @default(uuid()) @db.VarChar(36)
+
+  userName               String    @db.VarChar(50)
+  email                  String    @db.VarChar(50)
+  phone                  String    @db.VarChar(20)
+  password               String    @db.VarChar(72)
+  isEmailVerifiled       Boolean   @default(false) @map("is_email_verifiled")
+  isPhoneVerifiled       Boolean   @default(false) @map("is_phone_verifiled")
+  firstName              String    @map("first_name") @db.VarChar(50)
+  lastName               String?   @map("last_name") @db.VarChar(50)
+  avatar                 String?   @db.Text
+  cover                  String?   @db.Text
+  role                   String    @db.VarChar(10)
+  dob                    DateTime? @map("date_of_birth")
+  gender                 String    @db.VarChar(10)
+  emailVerificationToken String?   @map("email_verification_token") @db.Text
+  resetPasswordToken     String?   @map("reset_password_token") @db.Text
+  customerId             String?   @map("customer_id") @db.VarChar(100)
+  registrationTokens     String[]  @default([]) @map("registration_tokens")
+
+  addresses Address[]
+  cartItems CartItem[]
+  orders    Order[]
+  card      Card[]
+
+  @@map("users")
+}

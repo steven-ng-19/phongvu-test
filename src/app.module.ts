@@ -5,26 +5,27 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AllExceptionsFilter } from './common/filters';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './modules/auth/auth.module';
-import { CategoriesModule } from './modules/categories/categories.module';
+import { AuthModule } from '../modules/auth/auth.module';
+import { CategoriesModule } from '../modules/categories/categories.module';
+import { Environment } from './common/enums';
 import { FirebaseModule } from './shared/firebase/firebase.module';
-import { MediaModule } from './modules/medias/media.module';
+import { MediaModule } from '../modules/medias/media.module';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { OrdersModule } from './modules/orders/orders.module';
-import { ProductsModule } from './modules/products/products.module';
-import { PromotionModule } from './modules/promotions/promotions.module';
+import { OrdersModule } from '../modules/orders/orders.module';
+import { ProductsModule } from '../modules/products/products.module';
+import { PromotionModule } from '../modules/promotions/promotions.module';
 import { ResponseTransformInterceptor } from './common/interceptors';
 import { S3Module } from './shared/s3/s3.module';
 import { SendGridModule } from './shared/mail/mail.module';
 import { StripeModule } from './shared/stripe/stripe.module';
-import { UsersModule } from './modules/users/users.module';
-import { WishlistModule } from './modules/wishlist/wishlist.module';
+import { UsersModule } from '../modules/users/users.module';
+import { WishlistModule } from '../modules/wishlist/wishlist.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: `.env`,
+      envFilePath: `.env.${process.env.NODE_ENV || Environment.DEVELOPMENT}`,
       isGlobal: true,
       cache: true,
       validate(config) {

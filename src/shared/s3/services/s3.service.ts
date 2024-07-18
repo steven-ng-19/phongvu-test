@@ -7,7 +7,7 @@ import {
 
 import { CONFIG_VAR } from 'src/config';
 import { ConfigService } from '@nestjs/config';
-import { PresignedUrlDto } from 'src/modules/medias/dtos';
+import { PresignedUrlDto } from 'modules/medias/dtos';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 @Injectable()

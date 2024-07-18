@@ -1,0 +1,11 @@
+model Condition {
+    id String @id @default(uuid()) @db.VarChar(36)
+
+    orderValueMin Float @map("order_value_min")
+    orderValueMax Float @map("order_value_max")
+    minQuantity   Int   @default(1) @map("min_quantity")
+
+    promotion Promotion?
+
+    @@map("conditions")
+}
