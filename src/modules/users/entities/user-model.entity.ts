@@ -1,26 +1,29 @@
-import { Gender, UserRole } from 'src/common/enums';
+import * as Zod from 'zod';
 
-import { z } from 'zod';
+import { Gender, UserRole } from 'src/common/enums';
 
 export const roleValues = Object.values(UserRole) as [string, ...string[]];
 export const genderValues = Object.values(Gender) as [string, ...string[]];
-export const UserModel = z.object({
-  id: z.string(),
-  userName: z.string(),
-  email: z.string().email(),
-  phone: z.string(),
-  password: z.string(),
-  isEmailVerifiled: z.boolean(),
-  isPhoneVerifiled: z.boolean(),
-  firstName: z.string(),
-  lastName: z.string(),
-  avatar: z.string(),
-  cover: z.string(),
-  role: z.enum(roleValues),
-  dob: z.date(),
-  gender: z.enum(genderValues),
-  emailVerificationToken: z.string(),
-  resetPasswordToken: z.string(),
-  customerId: z.string(),
-  registrationTokens: z.array(z.string()),
+export const UserModel = Zod.object({
+  id: Zod.string(),
+  userName: Zod.string(),
+  email: Zod.string().email(),
+  phone: Zod.string(),
+  password: Zod.string(),
+  isEmailVerifiled: Zod.boolean(),
+  isPhoneVerifiled: Zod.boolean(),
+  firstName: Zod.string(),
+  lastName: Zod.string(),
+  avatar: Zod.string(),
+  cover: Zod.string(),
+  role: Zod.enum(roleValues),
+  dob: Zod.date(),
+  gender: Zod.enum(genderValues),
+  emailVerificationToken: Zod.string(),
+  resetPasswordToken: Zod.string(),
+  customerId: Zod.string(),
+  registrationTokens: Zod.string(),
+  createdAt: Zod.date(),
+  updatedAt: Zod.date(),
+  deletedAt: Zod.date(),
 });

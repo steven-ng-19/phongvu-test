@@ -2,16 +2,16 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class PaginateMetadataResponse {
   @ApiProperty()
-  page: number;
+  page!: number;
 
   @ApiProperty()
-  limit: number;
+  limit!: number;
 
   @ApiProperty()
-  totalRow: number;
+  totalRow!: number;
 
   @ApiProperty()
-  totalPage: number;
+  totalPage!: number;
 }
 
 export class HttpPaginateSuccessResponse<T> {

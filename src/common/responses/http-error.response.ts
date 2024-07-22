@@ -2,13 +2,13 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class HttpErrorResponse {
   @ApiProperty()
-  message: string;
+  message!: string;
 
   @ApiProperty()
-  messageCode: string;
+  messageCode!: string;
 
   @ApiProperty()
-  error: string;
+  error!: string;
 
   @ApiPropertyOptional()
   errors?: Record<string, unknown>;

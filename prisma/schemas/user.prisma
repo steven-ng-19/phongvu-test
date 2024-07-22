@@ -17,7 +17,11 @@ model User {
     emailVerificationToken String?   @map("email_verification_token") @db.Text
     resetPasswordToken     String?   @map("reset_password_token") @db.Text
     customerId             String?   @map("customer_id") @db.VarChar(100)
-    registrationTokens     String[]  @default([]) @map("registration_tokens")
+    registrationTokens     String?   @map("registration_tokens")
+
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
 
     addresses Address[]
     cartItems CartItem[]

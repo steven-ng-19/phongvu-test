@@ -2,15 +2,16 @@ import { CONFIG_VAR } from 'src/config';
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
-import { User } from '../../../../modules/users/models/user.schema';
+import { User } from 'src/modules/users/types';
+import { UserKeys } from 'src/modules/users/entities';
 
 @Injectable()
 export class StripeService {
   private stripe: Stripe;
 
-  constructor(private configService: ConfigService) {
+  constructor(private _configService: ConfigService) {
     this.stripe = new Stripe(
-      this.configService.get(CONFIG_VAR.STRIPE_API_SECRET_KEY),
+      _configService.getOrThrow(CONFIG_VAR.STRIPE_API_SECRET_KEY),
       {
         apiVersion: '2024-06-20',
       },
@@ -23,10 +24,9 @@ export class StripeService {
       email: user.email,
       phone: user.phone,
       metadata: {
-        userId: user._id.toString(),
+        userId: user[UserKeys.id].toString(),
       },
     };
-
     return this.stripe.customers.create(params);
   }
 

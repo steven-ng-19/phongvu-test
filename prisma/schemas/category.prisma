@@ -6,6 +6,9 @@ model Category {
     image        String  @db.VarChar(100)
     isDeprecated Boolean @default(false)
 
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @map("updated_at")
+
     products Product[]
 
     @@map("categories")

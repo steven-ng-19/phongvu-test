@@ -16,11 +16,19 @@ export const UserEntity = UserModel.extend({
   [UserKeys.isEmailVerifiled]: UserShape.isEmailVerifiled.optional(),
   [UserKeys.isPhoneVerifiled]: UserShape.isPhoneVerifiled.optional(),
   [UserKeys.firstName]: UserShape.firstName.trim().min(2).max(50),
-  [UserKeys.lastName]: UserShape.lastName.trim().min(2).max(50),
-  [UserKeys.avatar]: UserShape.avatar.trim(),
-  [UserKeys.cover]: UserShape.cover.trim(),
+  [UserKeys.lastName]: UserShape.lastName
+    .trim()
+    .min(2)
+    .max(50)
+    .optional()
+    .nullable(),
+  [UserKeys.avatar]: UserShape.avatar.trim().optional().nullable(),
+  [UserKeys.cover]: UserShape.cover.trim().nullable().optional(),
   [UserKeys.role]: UserShape.role,
-  [UserKeys.dob]: UserShape.dob.refine((date) => date < new Date()),
+  [UserKeys.dob]: UserShape.dob
+    .refine((date) => date < new Date())
+    .nullable()
+    .optional(),
   [UserKeys.gender]: UserShape.gender,
   [UserKeys.emailVerificationToken]: UserShape.emailVerificationToken
     .trim()
@@ -31,5 +39,11 @@ export const UserEntity = UserModel.extend({
     .nullable()
     .optional(),
   [UserKeys.customerId]: UserShape.customerId.trim().optional().nullable(),
-  [UserKeys.registrationTokens]: UserShape.registrationTokens,
+  [UserKeys.registrationTokens]: UserShape.registrationTokens
+    .nullable()
+    .optional(),
+
+  [UserKeys.createdAt]: UserShape.createdAt,
+  [UserKeys.updatedAt]: UserShape.updatedAt.nullable().optional(),
+  [UserKeys.deletedAt]: UserShape.deletedAt.nullable().optional(),
 });

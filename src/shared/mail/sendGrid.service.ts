@@ -17,7 +17,9 @@ export type SendGridHtmlMessage = Omit<SendGridMessage, 'text'>;
 @Injectable()
 export class SendGridService {
   constructor(private configService: ConfigService) {
-    SendGrid.setApiKey(this.configService.get(CONFIG_VAR.SENDGRID_API_KEY));
+    SendGrid.setApiKey(
+      this.configService.getOrThrow(CONFIG_VAR.SENDGRID_API_KEY),
+    );
   }
 
   public async sendEmail(

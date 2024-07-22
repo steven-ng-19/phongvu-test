@@ -5,22 +5,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AllExceptionsFilter } from './common/filters';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from '../modules/auth/auth.module';
-import { CategoriesModule } from '../modules/categories/categories.module';
 import { Environment } from './common/enums';
 import { FirebaseModule } from './shared/firebase/firebase.module';
-import { MediaModule } from '../modules/medias/media.module';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { OrdersModule } from '../modules/orders/orders.module';
-import { ProductsModule } from '../modules/products/products.module';
-import { PromotionModule } from '../modules/promotions/promotions.module';
+import { PrismaModule } from './shared/prisma/prisma.module';
 import { ResponseTransformInterceptor } from './common/interceptors';
-import { S3Module } from './shared/s3/s3.module';
 import { SendGridModule } from './shared/mail/mail.module';
 import { StripeModule } from './shared/stripe/stripe.module';
-import { UsersModule } from '../modules/users/users.module';
-import { WishlistModule } from '../modules/wishlist/wishlist.module';
+import { UserModule } from './modules/users/user.module';
 
 @Module({
   imports: [
@@ -32,23 +25,11 @@ import { WishlistModule } from '../modules/wishlist/wishlist.module';
         return ConfigSchema.parse(config);
       },
     }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get(CONFIG_VAR.MONGO_DB_URI),
-      }),
-    }),
+    UserModule,
+
+    // Shared
+    PrismaModule,
     StripeModule,
-    UsersModule,
-    CategoriesModule,
-    AuthModule,
-    ProductsModule,
-    OrdersModule,
-    PromotionModule,
-    S3Module,
-    MediaModule,
-    WishlistModule,
     SendGridModule,
     FirebaseModule,
   ],
