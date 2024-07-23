@@ -8,6 +8,10 @@ model Gift {
     quantity            Int
     maxQuantityPerOrder Int    @default(1) @map("max_quantity_per_order")
 
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
     benefit Benefit @relation(fields: [benefitId], references: [id])
 
     @@map("gifts")

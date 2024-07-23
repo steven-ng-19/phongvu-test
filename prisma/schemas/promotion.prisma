@@ -10,8 +10,9 @@ model Promotion {
     isDefault   Boolean  @default(false) @map("is_default")
     applyOn     String?  @map("apply_on")
 
-    createdAt DateTime  @default(now()) @map("created_at")
+    reatedAt  DateTime  @default(now()) @map("created_at")
     updatedAt DateTime? @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
 
     condition Condition @relation(fields: [conditionId], references: [id])
     benefit   Benefit   @relation(fields: [benefitId], references: [id])
