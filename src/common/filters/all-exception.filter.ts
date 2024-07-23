@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 
 import { HttpAdapterHost } from '@nestjs/core';
+import { ResponseService } from 'src/shared/response/response.service';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -23,7 +24,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    // const response = ResponseService.errorResponse(exception);
-    // httpAdapter.reply(res, { ...response, path: req?.url ?? null }, status);
+    const response = ResponseService.errorResponse(exception);
+    httpAdapter.reply(res, { ...response, path: req?.url ?? null }, status);
   }
 }

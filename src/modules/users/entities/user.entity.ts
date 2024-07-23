@@ -6,7 +6,7 @@ export const UserKeys = UserModel.keyof().enum;
 
 export const UserEntity = UserModel.extend({
   [UserKeys.id]: UserShape.id.uuid().trim(),
-  [UserKeys.userName]: UserShape.userName.trim().length(50),
+  [UserKeys.userName]: UserShape.userName.trim().max(50),
   [UserKeys.email]: UserShape.email.email().trim().toLowerCase(),
   [UserKeys.phone]: UserShape.phone.refine((phone) => {
     const phoneNumber = parsePhoneNumber(phone);

@@ -16,18 +16,24 @@ export const ConfigSchema = z
     [CONFIG_VAR.MONGO_DB_URI]: z.string().trim(),
 
     // JWT
+    [CONFIG_VAR.ADMIN_JWT_SECRET]: z.string().trim(),
+    [CONFIG_VAR.ADMIN_JWT_REFRESH_SECRET]: z.string().trim(),
     [CONFIG_VAR.JWT_SECRET]: z.string().trim(),
-    [CONFIG_VAR.JWT_EXPIRES_IN]: z.string().trim(),
+    [CONFIG_VAR.JWT_ACCESS_EXPIRES_IN]: z.string().trim(),
     [CONFIG_VAR.JWT_REFRESH_SECRET]: z.string().trim(),
     [CONFIG_VAR.JWT_REFRESH_EXPIRES_IN]: z.string().trim(),
+    [CONFIG_VAR.FORGOT_JWT_SECRET]: z.string().trim(),
+    [CONFIG_VAR.JWT_FORGOT_EXPIRES_IN]: z.string().trim(),
 
     // REDIS
     [CONFIG_VAR.REDIS_HOST]: z.string().trim(),
     [CONFIG_VAR.REDIS_PORT]: z.string().trim(),
     [CONFIG_VAR.REDIS_PASSWORD]: z.string().trim(),
 
-    // SENDGRID
+    // MAIL
     [CONFIG_VAR.SENDGRID_API_KEY]: z.string().trim(),
+    [CONFIG_VAR.MAIL_USER]: z.string().trim(),
+    [CONFIG_VAR.MAIL_PASSWORD]: z.string().trim(),
 
     // CLOUDINARY
     [CONFIG_VAR.CLOUDINARY_NAME]: z.string().trim(),
