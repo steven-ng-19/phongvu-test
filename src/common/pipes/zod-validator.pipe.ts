@@ -17,7 +17,7 @@ export class ZodValidationPipe implements PipeTransform {
       throw new HttpException(
         {
           code: result.error.errors[0].code,
-          path: result.error.errors[0].path,
+          path: result.error.errors[0].path[0],
           message: result.error.errors,
         },
         HttpStatus.BAD_REQUEST,

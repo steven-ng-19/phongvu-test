@@ -1,23 +1,19 @@
 model User {
-    id String @id @default(uuid()) @db.VarChar(36)
+    id      String @id @default(uuid()) @db.VarChar(36)
+    clerkId String @map("clerk_id") @db.Text
 
-    userName               String    @db.VarChar(50)
-    email                  String    @db.VarChar(50)
-    phone                  String    @db.VarChar(20)
-    password               String    @db.VarChar(72)
-    isEmailVerifiled       Boolean   @default(false) @map("is_email_verifiled")
-    isPhoneVerifiled       Boolean   @default(false) @map("is_phone_verifiled")
-    firstName              String    @map("first_name") @db.VarChar(50)
-    lastName               String?   @map("last_name") @db.VarChar(50)
-    avatar                 String?   @db.Text
-    cover                  String?   @db.Text
-    role                   String    @db.VarChar(10)
-    dob                    DateTime? @map("date_of_birth")
-    gender                 String    @db.VarChar(10)
-    emailVerificationToken String?   @map("email_verification_token") @db.Text
-    resetPasswordToken     String?   @map("reset_password_token") @db.Text
-    customerId             String?   @map("customer_id") @db.VarChar(100)
-    registrationTokens     String?   @map("registration_tokens")
+    userName  String    @db.VarChar(50)
+    email     String    @db.VarChar(50)
+    phone     String    @db.VarChar(20)
+    firstName String    @map("first_name") @db.VarChar(50)
+    lastName  String?   @map("last_name") @db.VarChar(50)
+    avatar    String?   @db.Text
+    cover     String?   @db.Text
+    role      String    @db.VarChar(10)
+    dob       DateTime? @map("date_of_birth")
+    gender    String    @db.VarChar(10)
+
+    customerId String? @map("customer_id") @db.VarChar(100)
 
     createdAt DateTime  @default(now()) @map("created_at")
     updatedAt DateTime? @map("updated_at")

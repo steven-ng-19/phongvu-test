@@ -29,6 +29,7 @@ export const ConfigSchema = z
     [CONFIG_VAR.REDIS_HOST]: z.string().trim(),
     [CONFIG_VAR.REDIS_PORT]: z.string().trim(),
     [CONFIG_VAR.REDIS_PASSWORD]: z.string().trim(),
+    [CONFIG_VAR.REDIS_DB_QUEUE]: z.string().trim(),
 
     // MAIL
     [CONFIG_VAR.SENDGRID_API_KEY]: z.string().trim(),
@@ -51,6 +52,11 @@ export const ConfigSchema = z
     [CONFIG_VAR.AWS_ENDPOINT]: z.string().trim(),
     [CONFIG_VAR.AWS_REGION]: z.string().trim(),
     [CONFIG_VAR.AWS_SECRET_ACCESS_KEY]: z.string().trim(),
+
+    // CLERK
+    [CONFIG_VAR.CLERK_API_PUBLIC_KEY]: z.string().trim(),
+    [CONFIG_VAR.CLERK_API_SECRET_KEY]: z.string().trim(),
+    [CONFIG_VAR.CLERK_JWT_KEY]: z.string().trim(),
   })
   .required();
 

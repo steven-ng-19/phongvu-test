@@ -15,12 +15,14 @@ export const UserUniqueKeySchema = Zod.union([
   Zod.object({ id: Zod.string() }),
   Zod.object({ email: Zod.string() }),
   Zod.object({ customerId: Zod.string() }),
+  Zod.object({ clerkId: Zod.string() }),
 ]);
 
 export const UserManyUniqueKeysSchema = Zod.union([
   Zod.object({ id: Zod.array(Zod.string()) }),
   Zod.object({ email: Zod.array(Zod.string()) }),
   Zod.object({ customerId: Zod.array(Zod.string()) }),
+  Zod.object({ clerkId: Zod.array(Zod.string()) }),
 ]);
 
 export type User = UserDto;
@@ -34,8 +36,12 @@ export type CreateUserParams = EntityWithoutFields<
   (typeof CREATE_PARAMS_WITHOUT_FIELDS)[number]
 >;
 
+const ADDRESS_PARAMS_WITHOUT_FIELDS = [
+  ...UPDATE_PARAMS_WITHOUT_FIELDS,
+  'clerkId',
+] as const;
 export type UpdateUserParams = OptionalNullableFields<
-  EntityWithoutFields<User, (typeof UPDATE_PARAMS_WITHOUT_FIELDS)[number]>
+  EntityWithoutFields<User, (typeof ADDRESS_PARAMS_WITHOUT_FIELDS)[number]>
 >;
 
 export type UserFindByUniqueKeyParams = Zod.infer<

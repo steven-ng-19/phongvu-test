@@ -2,6 +2,7 @@ import * as bcrypt from 'bcryptjs';
 
 import {
   ADMIN_JWT_TOKEN,
+  CLERK_JWT_TOKEN,
   FORGOT_TOKEN,
   JWT_ACCESS_TOKEN,
   JWT_REFRESH_TOKEN,
@@ -11,21 +12,25 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ClerkPayload, ResponseToken, TokenPayload, TokenType } from '../types';
+import { CreateUserDto, UserKeys } from 'src/modules/users/entities';
 import { CreateUserParams, User } from 'src/modules/users/types';
+import { ForgotPasswordDto, LoginDto, RefreshTokenDto } from '../dtos';
 import { Gender, UserRole } from 'src/common/enums';
 import { JwtPayload, SignOptions, decode, sign, verify } from 'jsonwebtoken';
-import { LoginDto, RefreshTokenDto } from '../dtos';
-import { ResponseToken, TokenPayload, TokenType } from '../types';
 
 import { AUTH_ERRORS } from 'src/common/contents/errors/auth.error';
+import { AuthQueueService } from './auth-queue.service';
 import { CONFIG_VAR } from 'src/config';
+import { ClerkService } from 'src/shared/clerk/clerk.service';
 import { ConfigService } from '@nestjs/config';
 import { MAIL_TEMPLATE } from 'src/shared/mail/constants';
 import { MailService } from 'src/shared/mail/services';
 import { RegisterDto } from '../dtos/register.dto';
 import { ResponseSuccess } from 'src/common/types';
-import { UserKeys } from 'src/modules/users/entities';
+import { UpdateUserDto } from 'src/modules/users/dtos';
 import { UserService } from 'src/modules/users/services';
+import { randomBytes } from 'crypto';
 import { string } from 'zod';
 
 @Injectable()
@@ -35,6 +40,7 @@ export class AuthService {
     [JWT_ACCESS_TOKEN]: string;
     [JWT_REFRESH_TOKEN]: string;
     [FORGOT_TOKEN]: string;
+    [CLERK_JWT_TOKEN]: string;
   };
   private readonly _jwtOptions: {
     [ADMIN_JWT_TOKEN]: SignOptions;
@@ -46,6 +52,8 @@ export class AuthService {
     private readonly _userService: UserService,
     private readonly _configService: ConfigService,
     private readonly _mailService: MailService,
+    private readonly _authQueueService: AuthQueueService,
+    private readonly _clerkService: ClerkService,
   ) {
     this._jwtKeys = {
       [ADMIN_JWT_TOKEN]: _configService.getOrThrow(
@@ -62,6 +70,10 @@ export class AuthService {
       ),
       [FORGOT_TOKEN]: _configService.getOrThrow(
         CONFIG_VAR.FORGOT_JWT_SECRET,
+        'default_secret',
+      ),
+      [CLERK_JWT_TOKEN]: _configService.getOrThrow(
+        CONFIG_VAR.CLERK_JWT_KEY,
         'default_secret',
       ),
     };
@@ -81,130 +93,72 @@ export class AuthService {
     };
   }
 
-  async login(user: User): Promise<ResponseToken> {
-    const { id } = user;
-    const payload: TokenPayload = { id };
-    const accessToken = await this._generateToken(payload, JWT_ACCESS_TOKEN);
-    const refreshToken = await this._generateToken(payload, JWT_REFRESH_TOKEN);
-    const { exp: accessTokenExpiration } = this._decodeToken(
-      accessToken,
-    ) as JwtPayload;
-    const { exp: refreshTokenExpiration } = this._decodeToken(
-      refreshToken,
-    ) as JwtPayload;
-    const result: ResponseToken = {
-      accessToken,
-      accessTokenExpiration,
-      refreshToken,
-      refreshTokenExpiration,
-    };
-    return result;
+  async login(data: ClerkPayload): Promise<ResponseSuccess> {
+    const user = await this._userService.findOne({ clerkId: data.userId });
+    if (!user) throw new BadRequestException(AUTH_ERRORS.NOT_FOUND);
+    return { success: true };
   }
 
-  async adminLogin(user: User): Promise<ResponseToken> {
-    const { id, role } = user;
-    if (role !== UserRole.ADMIN)
+  async adminLogin(data: ClerkPayload): Promise<ResponseSuccess> {
+    const user = await this._userService.findOne({ clerkId: data.userId });
+    if (!user) throw new BadRequestException(AUTH_ERRORS.NOT_FOUND);
+    if (user.role !== UserRole.ADMIN)
       throw new BadRequestException(AUTH_ERRORS.NOT_PERMISSION);
-    const payload: TokenPayload = { id };
-    const accessToken = await this._generateToken(payload, ADMIN_JWT_TOKEN);
-    const refreshToken = await this._generateToken(payload, ADMIN_JWT_TOKEN);
-    const { exp: accessTokenExpiration } = this._decodeToken(
-      accessToken,
-    ) as JwtPayload;
-    const { exp: refreshTokenExpiration } = this._decodeToken(
-      refreshToken,
-    ) as JwtPayload;
-    const result: ResponseToken = {
-      accessToken,
-      accessTokenExpiration,
-      refreshToken,
-      refreshTokenExpiration,
-    };
-    return result;
+    return { success: true };
   }
 
   async register(data: RegisterDto): Promise<ResponseSuccess> {
+    const clerkUser = await this._verifyToken(data.token, CLERK_JWT_TOKEN);
     const existedUser = await this._userService.findOne({
-      email: data.email,
+      clerkId: clerkUser.userId,
     });
-    if (existedUser) throw new BadRequestException(AUTH_ERRORS.CANNOT_REGISTER);
-    data.password = await this._hashPassword(data.password);
-    const userData: CreateUserParams = {
-      ...data,
-      gender: Gender.OTHER,
+    if (existedUser) {
+      const userData: UpdateUserDto = {
+        firstName: clerkUser.firstName ?? existedUser.firstName,
+        lastName: clerkUser.lastName ?? existedUser.lastName,
+        avatar: clerkUser.avatar ?? existedUser.avatar,
+      };
+
+      const user = await this._userService.update(
+        { id: existedUser.id },
+        userData,
+      );
+      return { success: true };
+    }
+
+    const userData: CreateUserDto = {
+      clerkId: clerkUser.userId,
+      email: clerkUser.email,
+      firstName: clerkUser.firstName ? clerkUser.firstName : '',
+      lastName: clerkUser.lastName,
+      phone: clerkUser.phone ? clerkUser.phone : '',
       role: UserRole.USER,
+      gender: Gender.OTHER,
+      userName: clerkUser.userName ? clerkUser.userName : '',
+      avatar: clerkUser.avatar,
     };
+    console.log(clerkUser);
     const user = await this._userService.create(userData);
     return { success: true };
   }
 
-  async refreshToken({
-    refreshToken,
-  }: RefreshTokenDto): Promise<ResponseToken> {
-    const verify = this._verifyToken(refreshToken, JWT_REFRESH_TOKEN);
-    if (!verify) throw new UnauthorizedException(AUTH_ERRORS.INVALID_TOKEN);
+  // async forgotPassword({ email }: ForgotPasswordDto): Promise<ResponseSuccess> {
+  //   const user = await this._userService.findOne({ email });
+  //   if (!user) throw new BadRequestException(AUTH_ERRORS.NOT_FOUND);
 
-    const { id } = verify as JwtPayload;
-    const user = await this._userService.findOne({ id });
-    if (!user) throw new UnauthorizedException(AUTH_ERRORS.INVALID_TOKEN);
+  //   const code = await this._generateCode();
+  //   const payload: TokenPayload = { id: user.id, code: code };
+  //   const token = await this._generateToken(payload, FORGOT_TOKEN);
 
-    const payload: TokenPayload = { id };
-    const accessToken = await this._generateToken(payload, JWT_ACCESS_TOKEN);
+  //   const url = `http://localhost:3000/reset-password-ui/?token=${token}`;
+  //   await this._authQueueService.addJobSendEmailResetPassword(email, url);
+  //   return { success: true };
+  // }
 
-    const { exp: accessTokenExpiration } = this._decodeToken(
-      accessToken,
-    ) as JwtPayload;
-
-    const result: ResponseToken = {
-      accessToken,
-      accessTokenExpiration,
-    };
-    return result;
-  }
-
-  async adminRefreshToken({
-    refreshToken,
-  }: RefreshTokenDto): Promise<ResponseToken> {
-    const verify = this._verifyToken(refreshToken, ADMIN_JWT_TOKEN);
-    if (!verify) throw new UnauthorizedException(AUTH_ERRORS.INVALID_TOKEN);
-
-    const { id } = verify as JwtPayload;
-    const user = await this._userService.findOne({ id });
-    if (!user) throw new UnauthorizedException(AUTH_ERRORS.INVALID_TOKEN);
-
-    if (user.role !== UserRole.ADMIN)
-      throw new UnauthorizedException(AUTH_ERRORS.INVALID_TOKEN);
-
-    const payload: TokenPayload = { id };
-    const accessToken = await this._generateToken(payload, ADMIN_JWT_TOKEN);
-    const { exp: accessTokenExpiration } = this._decodeToken(
-      accessToken,
-    ) as JwtPayload;
-
-    const result: ResponseToken = {
-      accessToken,
-      accessTokenExpiration,
-    };
-    return result;
-  }
-
-  async forgotPassword(email: string): Promise<ResponseSuccess> {
-    const user = await this._userService.findOne({ email });
+  async validateUser(clerkId: string): Promise<User> {
+    const user = await this._userService.findOne({ clerkId });
     if (!user) throw new BadRequestException(AUTH_ERRORS.NOT_FOUND);
-    const payload: TokenPayload = { id: user.id };
-    const token = await this._generateToken(payload, FORGOT_TOKEN);
-    return { success: true };
-  }
-
-  async validateUser({ email, password }: LoginDto): Promise<User> {
-    const user = await this._userService.findOne({ email });
-    if (!user) throw new BadRequestException(AUTH_ERRORS.NOT_FOUND);
-    const isMatch = await this._comparePassword(
-      password,
-      user[UserKeys.password],
-    );
-    if (isMatch) return user;
-    throw new BadRequestException(AUTH_ERRORS.INVALID_CREDENTIALS);
+    return user;
   }
 
   // PRIVATE FUNCTION
@@ -220,6 +174,10 @@ export class AuthService {
     return await bcrypt.compare(password, hashedPassword);
   }
 
+  private async _generateCode(): Promise<string> {
+    return randomBytes(4).toString('hex');
+  }
+
   private async _generateToken(
     payload: TokenPayload,
     type: TokenType,
@@ -227,10 +185,10 @@ export class AuthService {
     return sign(payload, this._jwtKeys[type], this._jwtOptions[type]);
   }
 
-  private _verifyToken(token: string, type: TokenType): JwtPayload | string {
+  private _verifyToken(token: string, type: TokenType): ClerkPayload {
     const payload = verify(token, this._jwtKeys[type]);
     if (!payload) throw new UnauthorizedException(AUTH_ERRORS.INVALID_TOKEN);
-    return payload;
+    return payload as ClerkPayload;
   }
 
   private _decodeToken(token: string): string | JwtPayload | null {

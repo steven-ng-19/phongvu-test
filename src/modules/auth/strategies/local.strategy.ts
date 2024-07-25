@@ -15,14 +15,14 @@ export class LocalStrategy extends PassportStrategy(Strategy, LOCAL_STRATEGY) {
     });
   }
 
-  async validate(email: string, password: string) {
-    const valiadte = LoginValidator.safeParse({ email, password });
+  // async validate(email: string, password: string) {
+  //   const valiadte = LoginValidator.safeParse({ email, password });
 
-    if (valiadte.error) {
-      throw new BadRequestException(valiadte.error.errors);
-    }
-    const user = await this._authService.validateUser({ email, password });
+  //   if (valiadte.error) {
+  //     throw new BadRequestException(valiadte.error.errors);
+  //   }
+  //   const user = await this._authService.validateUser({ email, password });
 
-    return user;
-  }
+  //   return user;
+  // }
 }

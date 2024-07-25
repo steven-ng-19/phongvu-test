@@ -1,5 +1,6 @@
 import {
   CreateUserParams,
+  UpdateUserParams,
   UserFindByConditionParams,
   UserFindByUniqueKeyParams,
   UserPrimaryKey,
@@ -41,7 +42,6 @@ export class UserMapper {
         id: true,
         avatar: true,
         email: true,
-        password: true,
         firstName: true,
         lastName: true,
         userName: true,
@@ -50,10 +50,6 @@ export class UserMapper {
         gender: true,
         customerId: true,
         phone: true,
-        isEmailVerifiled: true,
-        isPhoneVerifiled: true,
-        emailVerificationToken: true,
-        resetPasswordToken: true,
         role: true,
         createdAt: true,
         updatedAt: true,
@@ -100,7 +96,7 @@ export class UserMapper {
     };
   }
 
-  update(param: UserPrimaryKey, data: UpdateUserDto): Prisma.UserUpdateArgs {
+  update(param: UserPrimaryKey, data: UpdateUserParams): Prisma.UserUpdateArgs {
     return {
       where: {
         ...param,
@@ -110,6 +106,7 @@ export class UserMapper {
       },
       select: {
         id: true,
+        clerkId: true,
         avatar: true,
         email: true,
         firstName: true,
@@ -120,10 +117,6 @@ export class UserMapper {
         gender: true,
         customerId: true,
         phone: true,
-        isEmailVerifiled: true,
-        isPhoneVerifiled: true,
-        emailVerificationToken: true,
-        resetPasswordToken: true,
         role: true,
         createdAt: true,
         updatedAt: true,
@@ -142,6 +135,17 @@ export class UserMapper {
             createdAt: true,
           },
         },
+      },
+    };
+  }
+
+  delete(param: UserPrimaryKey): Prisma.UserUpdateArgs {
+    return {
+      where: {
+        ...param,
+      },
+      data: {
+        deletedAt: new Date(),
       },
     };
   }

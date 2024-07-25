@@ -2,10 +2,12 @@ import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { CONFIG_VAR, ConfigSchema } from './config';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
+import { AddressModule } from './modules/addresses/address.module';
 import { AllExceptionsFilter } from './common/filters';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
+import { ClerkModule } from './shared/clerk/clerk.module';
 import { Environment } from './common/enums';
 import { FirebaseModule } from './shared/firebase/firebase.module';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
@@ -14,6 +16,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PrismaModule } from './shared/prisma/prisma.module';
+import { QueueModule } from './shared/queues/queue.module';
 import { ResponseModule } from './shared/response/response.module';
 import { ResponseTransformInterceptor } from './common/interceptors';
 import { StripeModule } from './shared/stripe/stripe.module';
@@ -55,6 +58,7 @@ import { UserModule } from './modules/users/user.module';
     }),
     UserModule,
     AuthModule,
+    AddressModule,
 
     // Shared
     PrismaModule,
@@ -62,6 +66,8 @@ import { UserModule } from './modules/users/user.module';
     FirebaseModule,
     ResponseModule,
     MailModule,
+    QueueModule,
+    ClerkModule,
   ],
   controllers: [AppController],
   providers: [

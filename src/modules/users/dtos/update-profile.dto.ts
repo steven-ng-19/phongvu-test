@@ -1,14 +1,15 @@
 import { UserEntity } from '../entities';
-import { createZodDto } from 'nestjs-zod';
+import { createZodDto } from '@anatine/zod-nestjs';
 
 export const UpdateUserValidator = UserEntity.pick({
   avatar: true,
+  userName: true,
   cover: true,
   dob: true,
   firstName: true,
   lastName: true,
   phone: true,
   gender: true,
-});
+}).partial();
 
 export class UpdateUserDto extends createZodDto(UpdateUserValidator) {}
