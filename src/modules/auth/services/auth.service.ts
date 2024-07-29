@@ -93,13 +93,13 @@ export class AuthService {
     };
   }
 
-  async login(data: ClerkPayload): Promise<ResponseSuccess> {
+  async login(data: ClerkPayload): Promise<ResponseSuccess<void>> {
     const user = await this._userService.findOne({ clerkId: data.userId });
     if (!user) throw new BadRequestException(AUTH_ERRORS.NOT_FOUND);
     return { success: true };
   }
 
-  async adminLogin(data: ClerkPayload): Promise<ResponseSuccess> {
+  async adminLogin(data: ClerkPayload): Promise<ResponseSuccess<void>> {
     const user = await this._userService.findOne({ clerkId: data.userId });
     if (!user) throw new BadRequestException(AUTH_ERRORS.NOT_FOUND);
     if (user.role !== UserRole.ADMIN)
@@ -107,11 +107,14 @@ export class AuthService {
     return { success: true };
   }
 
-  async register(data: RegisterDto): Promise<ResponseSuccess> {
+  async register(data: RegisterDto): Promise<ResponseSuccess<void>> {
     const clerkUser = await this._verifyToken(data.token, CLERK_JWT_TOKEN);
-    const existedUser = await this._userService.findOne({
-      clerkId: clerkUser.userId,
-    });
+    const existedUser = await this._userService.findOne(
+      {
+        clerkId: clerkUser.userId,
+      },
+      true,
+    );
     if (existedUser) {
       const userData: UpdateUserDto = {
         firstName: clerkUser.firstName ?? existedUser.firstName,

@@ -1,3 +1,5 @@
+import * as Zod from 'zod';
+
 import {
   FilterOperationType,
   FilterOrder,
@@ -21,6 +23,7 @@ import {
 } from 'class-validator';
 
 import { Type } from 'class-transformer';
+import { createZodDto } from '@anatine/zod-nestjs';
 
 export class SingleFilter<T> implements ISingleFilter<T> {
   @IsString()

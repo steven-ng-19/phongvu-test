@@ -5,10 +5,11 @@ import {
   UserFindByUniqueKeyParams,
   UserPrimaryKey,
 } from '../types';
+import { UpdateUserDto, UserDto } from '../dtos';
 
+import { BaseQueryParamsDto } from 'src/common/dtos';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { UpdateUserDto } from '../dtos';
 
 @Injectable()
 export class UserMapper {
@@ -146,6 +147,32 @@ export class UserMapper {
       },
       data: {
         deletedAt: new Date(),
+      },
+    };
+  }
+
+  findMany(param: BaseQueryParamsDto<UserDto>): Prisma.UserFindManyArgs {
+    const { findOptions } = param;
+    return {
+      ...findOptions,
+      include: {
+        addresses: true,
+      },
+    };
+  }
+
+  count(param: UserFindByConditionParams): Prisma.UserCountArgs {
+    const { excludes = {}, ...rest } = param;
+    return {
+      where: {
+        ...rest,
+        ...Object.fromEntries(
+          Object.entries(excludes).map(([key, value]) => [
+            key,
+            { notIn: value },
+          ]),
+        ),
+        deletedAt: null,
       },
     };
   }
