@@ -2,6 +2,8 @@ import {
   CreateProductParams,
   ProductFindByConditionParams,
   ProductFindByUniqueKeyParams,
+  ProductFindManyPrimaryKeys,
+  ProductManyFindByUniqueKeyParams,
   ProductPrimaryKey,
   UpdateProductParams,
 } from '../types';
@@ -107,6 +109,16 @@ export class ProductMapper {
       },
       data: {
         deletedAt: new Date(),
+      },
+    };
+  }
+
+  checkProduct(param: ProductFindManyPrimaryKeys): Prisma.ProductFindManyArgs {
+    return {
+      where: {
+        id: {
+          in: param.ids,
+        },
       },
     };
   }

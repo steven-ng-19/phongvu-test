@@ -1,5 +1,5 @@
-import { AddressDto, FindAddressDto } from '../dtos';
 import {
+  Address,
   AddressFindByConditionParams,
   AddressFindByUniqueKeyParams,
   AddressFindManyByUniqueKeyParams,
@@ -7,10 +7,10 @@ import {
   CreateAddressParams,
   UpdateAddressParams,
 } from '../types';
+import { AddressDto, CreateAddressDto, FindAddressDto } from '../dtos';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { ADDRESS_ERRORS } from 'src/common/contents/errors/address.error';
-import { Address } from '@prisma/client';
 import { AddressMapper } from '../mappers';
 import { BaseQueryParamsDto } from 'src/common/dtos';
 import { ClerkService } from 'src/shared/clerk/clerk.service';
@@ -46,10 +46,12 @@ export class AddressService {
     return address;
   }
 
-  async create(data: CreateAddressParams): Promise<ResponseSuccess<Address>> {
-    const { userId } = data;
-    const user = this._userService.findOne({ id: userId });
-    const mapperData = this._mapper.create(data);
+  async create(
+    data: CreateAddressDto,
+    clerkId: string,
+  ): Promise<ResponseSuccess<Address>> {
+    const user = await this._userService.findOneByConditions({ clerkId });
+    const mapperData = this._mapper.create({ ...data, userId: user.id });
     const address = await this._prismaService.address.create(mapperData);
     return {
       success: true,

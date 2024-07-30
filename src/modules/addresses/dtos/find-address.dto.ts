@@ -19,7 +19,7 @@ export const FindAddressValidator = AddressEntity.pick({
     user: UserEntity.pick({
       clerkId: true,
       customerId: true,
-    }),
+    }).partial(),
   })
   .partial();
 

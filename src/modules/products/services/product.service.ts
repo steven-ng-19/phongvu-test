@@ -4,6 +4,8 @@ import {
   CreateProductParams,
   ProductFindByConditionParams,
   ProductFindByUniqueKeyParams,
+  ProductFindManyPrimaryKeys,
+  ProductManyFindByUniqueKeyParams,
   ProductPrimaryKey,
   UpdateProductParams,
 } from '../types';
@@ -73,6 +75,22 @@ export class ProductService {
     const product = await this._prismaService.product.findFirst(mapperData);
     if (!product) throw new BadRequestException(PRODUCT_ERRORS.NOT_FOUND);
     return product;
+  }
+
+  async checkProduct(
+    param: ProductFindManyPrimaryKeys,
+  ): Promise<{ products: Product[]; notFoundProduct: number }> {
+    const mapperData = this._mapper.checkProduct(param);
+    const products = await this._prismaService.product.findMany(mapperData);
+
+    const foundProduct = products.map((product) => product.id);
+    const notFoundProduct = param.ids.filter(
+      (id) => !foundProduct.includes(id),
+    );
+    return {
+      products,
+      notFoundProduct: notFoundProduct.length,
+    };
   }
 
   async findMany(

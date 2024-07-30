@@ -22,9 +22,17 @@ export const ProductManyUniqueKeys = Zod.union([
   Zod.object({ categoryId: Zod.array(Zod.string()) }),
 ]);
 
+export const ProductManyPrimaryKeys = Zod.object({
+  ids: Zod.array(Zod.string()),
+});
+
 export type Product = ProductDto;
 
 export type ProductPrimaryKey = Pick<Product, 'id'>;
+
+export type ProductFindManyPrimaryKeys = Zod.infer<
+  typeof ProductManyPrimaryKeys
+>;
 
 export type CreateProductParams = EntityWithoutFields<
   Product,

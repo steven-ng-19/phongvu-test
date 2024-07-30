@@ -67,13 +67,13 @@ export class AddressController {
     });
   }
 
-  @Post(':userId')
+  @Post()
   @UseGuards(ClerkAuthGuard)
   async create(
-    @Param('userId') userId: string,
+    @RequestUser() user: ClerkPayload,
     @Body(new ZodValidationPipe(CreateAddressValidator)) data: CreateAddressDto,
   ) {
-    return this._addressService.create({ ...data, userId });
+    return this._addressService.create(data, user.userId);
   }
 
   @UseGuards(ClerkAuthGuard)

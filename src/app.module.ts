@@ -18,6 +18,7 @@ import { MailModule } from './shared/mail/mail.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { OrderModule } from './modules/orders/order.module';
 import { PrismaModule } from './shared/prisma/prisma.module';
 import { ProductModule } from './modules/products/product.module';
 import { PromotionModule } from './modules/promotions/promotion.module';
@@ -68,6 +69,7 @@ import { UserModule } from './modules/users/user.module';
     ProductModule,
     PromotionModule,
     CartItemModule,
+    OrderModule,
 
     // Shared
     PrismaModule,
