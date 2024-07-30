@@ -7,6 +7,7 @@ import { AllExceptionsFilter } from './common/filters';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
+import { CartItemModule } from './modules/cart-items/cart-item.module';
 import { CategoryModel } from './modules/categories/entities';
 import { CategoryModule } from './modules/categories/category.module';
 import { ClerkModule } from './shared/clerk/clerk.module';
@@ -19,6 +20,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PrismaModule } from './shared/prisma/prisma.module';
 import { ProductModule } from './modules/products/product.module';
+import { PromotionModule } from './modules/promotions/promotion.module';
 import { QueueModule } from './shared/queues/queue.module';
 import { ResponseModule } from './shared/response/response.module';
 import { ResponseTransformInterceptor } from './common/interceptors';
@@ -64,6 +66,8 @@ import { UserModule } from './modules/users/user.module';
     AddressModule,
     CategoryModule,
     ProductModule,
+    PromotionModule,
+    CartItemModule,
 
     // Shared
     PrismaModule,

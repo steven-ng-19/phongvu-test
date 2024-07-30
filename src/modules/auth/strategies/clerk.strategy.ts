@@ -35,10 +35,13 @@ export class ClerkStategy extends PassportStrategy(Strategy, CLERK_STRATEGY) {
       const verifiedToken = await this.clerkService.getProfile(payload.sub);
       if (!verifiedToken)
         throw new UnauthorizedException(AUTH_ERRORS.INVALID_TOKEN);
+
       const user = await this._authService.validateUser(payload.userId);
+
       return payload;
     } catch (error) {
-      throw new UnauthorizedException('Invalid token');
+      console.log(error);
+      throw new UnauthorizedException(AUTH_ERRORS.INVALID_TOKEN);
     }
   }
 }

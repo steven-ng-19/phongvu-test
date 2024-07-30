@@ -17,6 +17,7 @@ import { USER_FILTER_FIELD, USER_RELATION_FILTER_FIELD } from '../constants';
 import { BaseQueryParamsDto } from 'src/common/dtos';
 import { ResponseService } from 'src/shared/response/response.service';
 import { Request } from 'express';
+import { Prisma } from '@prisma/client';
 
 @Controller('admin/users')
 export class AdminUserController {
@@ -34,15 +35,14 @@ export class AdminUserController {
   async getAll(
     @Req() req: Request,
     @Query(
-      new DirectFilterPipe<any, UserDto>(
+      new DirectFilterPipe<any, Prisma.UserWhereInput>(
         [...USER_FILTER_FIELD],
         USER_RELATION_FILTER_FIELD,
         [{ createdAt: 'asc' }, { id: 'asc' }],
       ),
     )
-    param: BaseQueryParamsDto<UserDto>,
+    param: BaseQueryParamsDto<Prisma.UserWhereInput>,
   ) {
-    console.log(param);
     const { data, count } = await this._userService.findAll(param);
     const { findOptions, ...rest } = param;
     return ResponseService.paginateResponse({ count, data, query: rest, req });

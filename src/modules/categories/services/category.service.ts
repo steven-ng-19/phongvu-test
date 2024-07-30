@@ -12,6 +12,7 @@ import { BaseQueryParamsDto } from 'src/common/dtos';
 import { CATEGORY_ERRORS } from 'src/common/contents/errors/category.error';
 import { CategoryDto } from '../dtos';
 import { CategoryMapper } from '../mappers';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { ResponseFindMany } from 'src/common/types/respone-find-many.type';
 import { ResponseSuccess } from 'src/common/types';
@@ -58,11 +59,12 @@ export class CategoryService {
   }
 
   async findAll(
-    param: BaseQueryParamsDto<CategoryDto>,
+    param: BaseQueryParamsDto<Prisma.CategoryWhereInput>,
   ): Promise<ResponseFindMany<Category>> {
     const mapperData = this._mapper.findMany(param);
-    const countData = this._mapper.count(param.findOptions.where);
-    const count = await this._prismaService.category.count(countData);
+    const count = await this._prismaService.category.count({
+      where: mapperData.where,
+    });
     const categories = await this._prismaService.category.findMany(mapperData);
     return {
       count,

@@ -151,8 +151,14 @@ export class UserMapper {
     };
   }
 
-  findMany(param: BaseQueryParamsDto<UserDto>): Prisma.UserFindManyArgs {
+  findMany(
+    param: BaseQueryParamsDto<Prisma.UserWhereInput>,
+  ): Prisma.UserFindManyArgs {
     const { findOptions } = param;
+    findOptions.where = {
+      ...findOptions.where,
+      deletedAt: null,
+    };
     return {
       ...findOptions,
       include: {

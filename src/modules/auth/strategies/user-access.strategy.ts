@@ -6,7 +6,7 @@ import { CONFIG_VAR } from 'src/config';
 import { ConfigService } from '@nestjs/config';
 import { JwtAccessPayload } from '../types';
 import { PassportStrategy } from '@nestjs/passport';
-import { User } from 'src/modules/users/types';
+import { User } from '@prisma/client';
 import { UserRole } from 'src/common/enums';
 import { UserService } from 'src/modules/users/services';
 

@@ -14,6 +14,7 @@ import { CATEGORY_FILTER_FIELD } from '../constants';
 import { BaseQueryParamsDto } from 'src/common/dtos';
 import { CategoryDto } from '../dtos';
 import { ResponseService } from 'src/shared/response/response.service';
+import { Prisma } from '@prisma/client';
 
 @Controller('categories')
 export class CategoryController {
@@ -24,13 +25,13 @@ export class CategoryController {
   async findAll(
     @Req() req: Request,
     @Query(
-      new DirectFilterPipe<any, CategoryDto>(
+      new DirectFilterPipe<any, Prisma.CategoryWhereInput>(
         [...CATEGORY_FILTER_FIELD],
         [],
         [{ createdAt: 'asc' }, { id: 'asc' }],
       ),
     )
-    query: BaseQueryParamsDto<CategoryDto>,
+    query: BaseQueryParamsDto<Prisma.CategoryWhereInput>,
   ) {
     const { data, count } = await this._categoryService.findAll(query);
     const { findOptions, ...rest } = query;

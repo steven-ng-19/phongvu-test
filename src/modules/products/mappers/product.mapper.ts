@@ -85,9 +85,13 @@ export class ProductMapper {
   }
 
   findMany(
-    param: BaseQueryParamsDto<FindProductDto>,
+    param: BaseQueryParamsDto<Prisma.ProductWhereInput>,
   ): Prisma.ProductFindManyArgs {
     const { findOptions } = param;
+    findOptions.where = {
+      ...findOptions.where,
+      deletedAt: null,
+    };
     return {
       ...findOptions,
       include: {

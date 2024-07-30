@@ -1,3 +1,4 @@
+import { AddressDto, FindAddressDto } from '../dtos';
 import {
   AddressFindByConditionParams,
   AddressFindByUniqueKeyParams,
@@ -7,7 +8,6 @@ import {
   UpdateAddressParams,
 } from '../types';
 
-import { AddressDto } from '../dtos';
 import { BaseQueryParamsDto } from 'src/common/dtos';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
@@ -46,27 +46,8 @@ export class AddressMapper {
     };
   }
 
-  findByKey(param: AddressFindByUniqueKeyParams): Prisma.AddressFindFirstArgs {
-    const { excludes = {}, ...rest } = param;
-    return {
-      where: {
-        ...rest,
-        ...Object.fromEntries(
-          Object.entries(excludes).map(([key, value]) => [
-            key,
-            { notIn: value },
-          ]),
-        ),
-        deletedAt: null,
-      },
-      include: {
-        user: true,
-      },
-    };
-  }
-
-  findByCondition(
-    param: AddressFindByConditionParams,
+  findOne(
+    param: AddressFindByUniqueKeyParams | AddressFindByConditionParams,
   ): Prisma.AddressFindFirstArgs {
     const { excludes = {}, ...rest } = param;
     return {
@@ -86,6 +67,18 @@ export class AddressMapper {
     };
   }
 
+  findByPrimaryKey(param: AddressPrimaryKey): Prisma.AddressFindFirstArgs {
+    return {
+      where: {
+        ...param,
+        deletedAt: null,
+      },
+      include: {
+        user: true,
+      },
+    };
+  }
+
   delete(param: AddressPrimaryKey): Prisma.AddressDeleteArgs {
     return {
       where: {
@@ -95,10 +88,13 @@ export class AddressMapper {
   }
 
   findManyByKey(
-    param: BaseQueryParamsDto<AddressDto>,
+    param: BaseQueryParamsDto<FindAddressDto>,
   ): Prisma.AddressFindManyArgs {
     const { findOptions } = param;
-    console.log(findOptions);
+    findOptions.where = {
+      ...findOptions.where,
+      deletedAt: null,
+    };
     return {
       ...findOptions,
       include: {

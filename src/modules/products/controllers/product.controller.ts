@@ -15,6 +15,7 @@ import { PRODUCT_FILTER_FIELD } from '../constants';
 import { DirectFilterPipe } from '@chax-at/prisma-filter';
 import { BaseQueryParamsDto } from 'src/common/dtos';
 import { ResponseService } from 'src/shared/response/response.service';
+import { Prisma } from '@prisma/client';
 
 @Controller('products')
 export class ProductController {
@@ -25,13 +26,13 @@ export class ProductController {
   async findAll(
     @Req() req: Request,
     @Query(
-      new DirectFilterPipe<any, FindProductDto>(
+      new DirectFilterPipe<any, Prisma.ProductWhereInput>(
         [...PRODUCT_FILTER_FIELD],
         [],
         [{ createdAt: 'asc' }, { id: 'asc' }],
       ),
     )
-    query: BaseQueryParamsDto<FindProductDto>,
+    query: BaseQueryParamsDto<Prisma.ProductWhereInput>,
   ) {
     const { count, data } = await this._productService.findMany(query);
     const { findOptions, ...rest } = query;

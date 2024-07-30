@@ -1,5 +1,5 @@
+import { AddressDto, FindAddressDto } from '../dtos';
 import {
-  Address,
   AddressFindByConditionParams,
   AddressFindByUniqueKeyParams,
   AddressFindManyByUniqueKeyParams,
@@ -10,7 +10,7 @@ import {
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { ADDRESS_ERRORS } from 'src/common/contents/errors/address.error';
-import { AddressDto } from '../dtos';
+import { Address } from '@prisma/client';
 import { AddressMapper } from '../mappers';
 import { BaseQueryParamsDto } from 'src/common/dtos';
 import { ClerkService } from 'src/shared/clerk/clerk.service';
@@ -18,6 +18,7 @@ import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { ResponseFindMany } from 'src/common/types/respone-find-many.type';
 import { ResponseSuccess } from 'src/common/types';
 import { USER_ERRORS } from 'src/common/contents/errors/user.error';
+import { User } from 'src/modules/users/types';
 import { UserService } from 'src/modules/users/services';
 
 @Injectable()
@@ -29,17 +30,17 @@ export class AddressService {
     private readonly _userService: UserService,
   ) {}
 
-  async findOne(param: AddressFindByUniqueKeyParams): Promise<Address> {
-    const mapperData = this._mapper.findByKey(param);
+  async findOneByPrimaryKey(param: AddressPrimaryKey): Promise<Address> {
+    const mapperData = this._mapper.findByPrimaryKey(param);
     const address = await this._prismaService.address.findFirst(mapperData);
     if (!address) throw new BadRequestException(ADDRESS_ERRORS.NOT_FOUND);
     return address;
   }
 
   async findOneByConditions(
-    param: AddressFindByConditionParams,
+    param: AddressFindByConditionParams | AddressFindByUniqueKeyParams,
   ): Promise<Address> {
-    const mapperData = this._mapper.findByCondition(param);
+    const mapperData = this._mapper.findOne(param);
     const address = await this._prismaService.address.findFirst(mapperData);
     if (!address) throw new BadRequestException(ADDRESS_ERRORS.NOT_FOUND);
     return address;
@@ -48,7 +49,6 @@ export class AddressService {
   async create(data: CreateAddressParams): Promise<ResponseSuccess<Address>> {
     const { userId } = data;
     const user = this._userService.findOne({ id: userId });
-
     const mapperData = this._mapper.create(data);
     const address = await this._prismaService.address.create(mapperData);
     return {
@@ -61,7 +61,7 @@ export class AddressService {
     param: AddressPrimaryKey,
     data: UpdateAddressParams,
   ): Promise<ResponseSuccess<Address>> {
-    const existAddress = await this.findOne(param);
+    const existAddress = await this.findOneByPrimaryKey(param);
     const mapperData = this._mapper.update(param, data);
     const address = await this._prismaService.address.update(mapperData);
     return {
@@ -79,9 +79,10 @@ export class AddressService {
   }
 
   async findAllByKey(
-    param: BaseQueryParamsDto<AddressDto>,
+    param: BaseQueryParamsDto<FindAddressDto>,
   ): Promise<ResponseFindMany<Address>> {
     const mapperData = this._mapper.findManyByKey(param);
+
     const countData = this._mapper.count(param.findOptions.where);
     const address = await this._prismaService.address.findMany(mapperData);
     const count = await this._prismaService.address.count(countData);
@@ -94,7 +95,7 @@ export class AddressService {
   async setDefault(
     param: AddressFindByUniqueKeyParams,
   ): Promise<ResponseSuccess<Address>> {
-    const address = await this.findOne(param);
+    const address = await this.findOneByConditions(param);
     const mapperData = this._mapper.update(
       { id: address.id },
       { isDefault: true },

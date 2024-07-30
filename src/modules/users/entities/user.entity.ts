@@ -25,7 +25,7 @@ export const UserEntity = UserModel.extend({
   [UserKeys.cover]: UserShape.cover.trim().nullable().optional(),
   [UserKeys.role]: UserShape.role,
   [UserKeys.dob]: UserShape.dob
-    .refine((date) => date < new Date())
+    .refine((date) => new Date(date) < new Date())
     .nullable()
     .optional(),
   [UserKeys.gender]: UserShape.gender,

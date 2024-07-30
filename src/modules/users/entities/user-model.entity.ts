@@ -14,9 +14,9 @@ export const UserModel = Zod.object({
   firstName: Zod.string(),
   lastName: Zod.string(),
   avatar: Zod.string(),
-  cover: Zod.string(),
+  cover: Zod.string().date(),
   role: Zod.enum(roleValues),
-  dob: Zod.date(),
+  dob: Zod.string().datetime(),
   gender: Zod.enum(genderValues),
 
   customerId: Zod.string(),

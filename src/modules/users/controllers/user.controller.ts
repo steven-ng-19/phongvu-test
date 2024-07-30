@@ -23,7 +23,6 @@ export class UserController {
 
   @Post('clerk')
   async reciveClerkEvent(@Body() payload: UserWebhookEvent) {
-    console.log(payload);
     switch (payload.type) {
       case CLERK_WEBHOOK_EVENT.USER_CREATED: {
         return;

@@ -7,12 +7,12 @@ import {
   ProductPrimaryKey,
   UpdateProductParams,
 } from '../types';
+import { Prisma, Product } from '@prisma/client';
 
 import { BaseQueryParamsDto } from 'src/common/dtos';
 import { CategoryService } from 'src/modules/categories/services';
 import { PRODUCT_ERRORS } from 'src/common/contents/errors/product.error';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
-import { Product } from '@prisma/client';
 import { ProductMapper } from '../mappers';
 import { ResponseFindMany } from 'src/common/types/respone-find-many.type';
 import { ResponseSuccess } from 'src/common/types';
@@ -76,11 +76,12 @@ export class ProductService {
   }
 
   async findMany(
-    param: BaseQueryParamsDto<FindProductDto>,
+    param: BaseQueryParamsDto<Prisma.ProductWhereInput>,
   ): Promise<ResponseFindMany<Product>> {
     const mapperData = this._mapper.findMany(param);
-    const countData = this._mapper.count(param.findOptions.where);
-    const count = await this._prismaService.product.count(countData);
+    const count = await this._prismaService.product.count({
+      where: mapperData.where,
+    });
     const products = await this._prismaService.product.findMany(mapperData);
     return {
       count,

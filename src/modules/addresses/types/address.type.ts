@@ -1,16 +1,18 @@
 import * as Zod from 'zod';
 
+import { AddressDto, FindAddressDto } from '../dtos';
+import {
+  CREATE_PARAMS_WITHOUT_FIELDS,
+  UPDATE_PARAMS_WITHOUT_FIELDS,
+} from 'src/common/constants/param-without-field.constant';
 import {
   EntityNotInFilter,
   EntityWithoutFields,
   OptionalNullableFields,
 } from 'src/common/types';
 
-import { AddressDto } from '../dtos';
-import { CREATE_PARAMS_WITHOUT_FIELDS } from 'src/common/constants/param-without-field.constant';
-
 export const AddressUniqueKeys = Zod.union([
-  Zod.object({ id: Zod.string() }),
+  Zod.object({ id: Zod.string(), clerkId: Zod.string() }),
   Zod.object({ userId: Zod.string() }),
 ]);
 
@@ -19,15 +21,26 @@ export const AddressManyUniqueKeys = Zod.union([
   Zod.object({ userId: Zod.array(Zod.string()) }),
 ]);
 
+const CREATE_ADDRESS_WITHOUT_FIELDS = [
+  ...CREATE_PARAMS_WITHOUT_FIELDS,
+  'user',
+] as const;
+const UPDATE_ADDRESS_WITHOUT_FIELDS = [
+  ...UPDATE_PARAMS_WITHOUT_FIELDS,
+  'user',
+] as const;
+
 export type Address = AddressDto;
+export type FindAddress = FindAddressDto;
+
 export type AddressPrimaryKey = Pick<Address, 'id'>;
 export type CreateAddressParams = EntityWithoutFields<
   Address,
-  (typeof CREATE_PARAMS_WITHOUT_FIELDS)[number]
+  (typeof CREATE_ADDRESS_WITHOUT_FIELDS)[number]
 >;
 
 export type UpdateAddressParams = OptionalNullableFields<
-  EntityWithoutFields<Address, (typeof CREATE_PARAMS_WITHOUT_FIELDS)[number]>
+  EntityWithoutFields<Address, (typeof UPDATE_ADDRESS_WITHOUT_FIELDS)[number]>
 >;
 
 export type AddressFindByUniqueKeyParams = Zod.infer<
@@ -42,6 +55,6 @@ export type AddressFindManyByUniqueKeyParams = Zod.infer<
   excludes?: EntityNotInFilter<Address>;
 };
 
-export type AddressFindByConditionParams = Partial<Address> & {
+export type AddressFindByConditionParams = Partial<FindAddress> & {
   excludes?: EntityNotInFilter<Address>;
 };

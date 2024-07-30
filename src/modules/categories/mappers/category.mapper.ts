@@ -65,9 +65,13 @@ export class CategoryMapper {
   }
 
   findMany(
-    param: BaseQueryParamsDto<CategoryDto>,
+    param: BaseQueryParamsDto<Prisma.CategoryWhereInput>,
   ): Prisma.CategoryFindManyArgs {
     const { findOptions } = param;
+    findOptions.where = {
+      ...findOptions.where,
+      deletedAt: null,
+    };
     return {
       ...findOptions,
     };

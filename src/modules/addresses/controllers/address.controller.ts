@@ -6,6 +6,7 @@ import {
   Post,
   Query,
   Req,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -14,17 +15,21 @@ import { AddressService } from '../services';
 import { DirectFilterPipe } from '@chax-at/prisma-filter';
 import { BaseQueryParamsDto } from 'src/common/dtos';
 import {
-  Address,
-  AddressFindByConditionParams,
-  AddressFindByUniqueKeyParams,
-  AddressFindManyByUniqueKeyParams,
-} from '../types';
-import { AddressDto, CreateAddressDto, CreateAddressValidator } from '../dtos';
+  AddressDto,
+  CreateAddressDto,
+  CreateAddressValidator,
+  FindAddressDto,
+} from '../dtos';
 import { ZodValidationPipe } from 'src/common/pipes';
 import { ApiPaginateResponse } from 'src/shared/response/dtos';
 import { Request } from 'express';
 import { ResponseService } from 'src/shared/response/response.service';
 import { ADDRESS_FILTER_FIELD } from '../constants';
+import { ClerkAuthGuard } from 'src/modules/auth/guards';
+import { RequestUser } from 'src/common/decorators';
+import { ClerkPayload } from 'src/modules/auth/types';
+import { AddressKeys } from '../entities';
+import { Address } from '../types';
 
 @Controller('addresses')
 export class AddressController {
@@ -32,24 +37,38 @@ export class AddressController {
 
   @Get()
   @UsePipes(new ValidationPipe({ transform: true }))
+  @UseGuards(ClerkAuthGuard)
   async findAll(
+    @RequestUser() user: ClerkPayload,
     @Req() req: Request,
     @Query(
-      new DirectFilterPipe<any, AddressDto>(
+      new DirectFilterPipe<any, FindAddressDto>(
         [...ADDRESS_FILTER_FIELD],
         [],
-        [{ createdAt: 'asc' }, { id: 'asc' }],
+        [{ createdAt: 'desc' }, { id: 'asc' }],
       ),
     )
-    param: BaseQueryParamsDto<AddressDto>,
+    param: BaseQueryParamsDto<FindAddressDto>,
   ): Promise<ApiPaginateResponse<Partial<Address>>> {
-    console.log(param);
-    const { data, count } = await this._addressService.findAllByKey(param);
     const { findOptions, ...rest } = param;
-    return ResponseService.paginateResponse({ count, data, query: rest, req });
+    param.findOptions.where = {
+      ...param.findOptions.where,
+      user: { clerkId: user.userId },
+    };
+    const { data, count } = await this._addressService.findAllByKey({
+      findOptions,
+      ...rest,
+    });
+    return ResponseService.paginateResponse({
+      count,
+      data,
+      query: rest,
+      req,
+    });
   }
 
   @Post(':userId')
+  @UseGuards(ClerkAuthGuard)
   async create(
     @Param('userId') userId: string,
     @Body(new ZodValidationPipe(CreateAddressValidator)) data: CreateAddressDto,
@@ -57,8 +76,15 @@ export class AddressController {
     return this._addressService.create({ ...data, userId });
   }
 
+  @UseGuards(ClerkAuthGuard)
   @Post('set-default/:addressId')
-  async setDefault(@Param('addressId') addressId: string) {
-    return this._addressService.setDefault({ id: addressId });
+  async setDefault(
+    @RequestUser() user: ClerkPayload,
+    @Param('addressId') addressId: string,
+  ) {
+    return this._addressService.setDefault({
+      id: addressId,
+      clerkId: user.userId,
+    });
   }
 }

@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   CreateUserParams,
-  User,
   UserFindByConditionParams,
   UserFindByUniqueKeyParams,
   UserPrimaryKey,
 } from '../types';
+import { Prisma, User } from '@prisma/client';
 import { UpdateUserDto, UserDto } from '../dtos';
 
 import { AddressFindByUniqueKeyParams } from 'src/modules/addresses/types';
@@ -33,7 +33,8 @@ export class UserService {
   ): Promise<User | null> {
     const mapperData = this._mapper.findByKey(param);
     const user = await this._prismaService.user.findFirst(mapperData);
-    if (!isRegister) throw new BadRequestException(USER_ERRORS.NOT_FOUND);
+    if (!isRegister && !user)
+      throw new BadRequestException(USER_ERRORS.NOT_FOUND);
     return user;
   }
 
@@ -46,13 +47,14 @@ export class UserService {
   }
 
   async findAll(
-    param: BaseQueryParamsDto<UserDto>,
+    param: BaseQueryParamsDto<Prisma.UserWhereInput>,
   ): Promise<ResponseFindMany<User>> {
     const mapperData = this._mapper.findMany(param);
     const users = await this._prismaService.user.findMany(mapperData);
 
-    const countData = this._mapper.count(param.findOptions.where);
-    const count = await this._prismaService.user.count(countData);
+    const count = await this._prismaService.user.count({
+      where: mapperData.where,
+    });
     return {
       count,
       data: users,
@@ -84,13 +86,13 @@ export class UserService {
         data.phone_numbers.find(
           (phone) => phone.id === data.primary_phone_number_id,
         )?.phone_number ?? undefined,
-      dob: data.public_metadata.dob as Date,
+      dob: data.public_metadata.dob as string,
       gender: data.public_metadata.gender as
         | Gender.FEMALE
         | Gender.MALE
         | Gender.OTHER,
     };
-    console.log('userData: ', userData);
+
     return userData;
   }
 
