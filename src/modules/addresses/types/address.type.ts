@@ -12,7 +12,7 @@ import {
 } from 'src/common/types';
 
 export const AddressUniqueKeys = Zod.union([
-  Zod.object({ id: Zod.string(), clerkId: Zod.string() }),
+  Zod.object({ id: Zod.string(), userId: Zod.string() }),
   Zod.object({ userId: Zod.string() }),
 ]);
 

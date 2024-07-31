@@ -14,6 +14,6 @@ export const CategoryEntity = CategoryModel.extend({
   [CategoryKey.isDeprecated]: CategoryShape.isDeprecated.default(false),
 
   [CategoryKey.createdAt]: CategoryShape.createdAt,
-  [CategoryKey.updatedAt]: CategoryShape.updatedAt.nullable().optional(),
+  [CategoryKey.updatedAt]: CategoryShape.updatedAt,
   [CategoryKey.deletedAt]: CategoryShape.deletedAt.nullable().optional(),
 });

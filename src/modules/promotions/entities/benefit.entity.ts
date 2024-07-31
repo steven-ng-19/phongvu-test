@@ -9,6 +9,6 @@ export const BenefitEntity = BenefitModel.extend({
   [BenefitKeys.promotionId]: BenefitShape.promotionId.trim(),
 
   [BenefitKeys.createdAt]: BenefitShape.createdAt,
-  [BenefitKeys.updatedAt]: BenefitShape.updatedAt.nullable().optional(),
+  [BenefitKeys.updatedAt]: BenefitShape.updatedAt,
   [BenefitKeys.deletedAt]: BenefitShape.deletedAt.nullable().optional(),
 });

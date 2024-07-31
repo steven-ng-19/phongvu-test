@@ -12,6 +12,6 @@ export const GalleryEntity = GalleryModel.extend({
   [GalleryKeys.order]: GalleryShape.order.min(0).max(15).default(0),
 
   [GalleryKeys.createdAt]: GalleryShape.createdAt,
-  [GalleryKeys.updatedAt]: GalleryShape.updatedAt.nullable().optional(),
+  [GalleryKeys.updatedAt]: GalleryShape.updatedAt,
   [GalleryKeys.deletedAt]: GalleryShape.deletedAt.nullable().optional(),
 });

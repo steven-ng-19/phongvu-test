@@ -12,6 +12,6 @@ export const ConditionEntity = ConditionModel.extend({
   [ConditionKeys.minQuantity]: ConditionShape.minQuantity.default(1),
 
   [ConditionKeys.createdAt]: ConditionShape.createdAt,
-  [ConditionKeys.updatedAt]: ConditionShape.updatedAt.nullable().optional(),
+  [ConditionKeys.updatedAt]: ConditionShape.updatedAt,
   [ConditionKeys.deletedAt]: ConditionShape.deletedAt.nullable().optional(),
 });

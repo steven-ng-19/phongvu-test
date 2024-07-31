@@ -38,7 +38,10 @@ export class ClerkStategy extends PassportStrategy(Strategy, CLERK_STRATEGY) {
 
       const user = await this._authService.validateUser(payload.userId);
 
-      return payload;
+      return {
+        ...payload,
+        localId: user.id,
+      };
     } catch (error) {
       console.log(error);
       throw new UnauthorizedException(AUTH_ERRORS.INVALID_TOKEN);

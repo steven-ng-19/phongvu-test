@@ -23,5 +23,5 @@ export const AddressEntity = AdderssModel.extend({
 
   [AddressKeys.deletedAt]: AddressShape.deletedAt.nullable().optional(),
   [AddressKeys.createdAt]: AddressShape.createdAt,
-  [AddressKeys.updatedAt]: AddressShape.updatedAt.nullable().optional(),
+  [AddressKeys.updatedAt]: AddressShape.updatedAt,
 });

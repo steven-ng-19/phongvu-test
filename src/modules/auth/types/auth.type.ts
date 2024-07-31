@@ -46,4 +46,5 @@ export type ClerkPayload = {
   sub: string;
   userId: string;
   userName: string | null;
+  localId: string;
 };

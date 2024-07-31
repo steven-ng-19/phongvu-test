@@ -7,7 +7,7 @@ import { ProductEntity } from 'src/modules/products/entities';
 import { createZodDto } from '@anatine/zod-nestjs';
 
 export const OrderValidator = OrderEntity.extend({
-  addressData: AddressEntity.partial(),
+  addressData: AddressEntity.optional(),
   orderItems: Zod.array(
     OrderItemEntity.extend({
       productData: ProductEntity.partial(),
@@ -17,7 +17,7 @@ export const OrderValidator = OrderEntity.extend({
       createdAt: true,
       deletedAt: true,
     }),
-  ),
+  ).optional(),
 });
 
 export class OrderDto extends createZodDto(OrderValidator) {}

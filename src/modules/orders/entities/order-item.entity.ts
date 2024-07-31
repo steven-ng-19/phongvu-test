@@ -26,6 +26,6 @@ export const OrderItemEntity = OrderItemModel.extend({
     .optional(),
 
   [OrderItemKeys.createdAt]: OrderItemShape.createdAt,
-  [OrderItemKeys.updatedAt]: OrderItemShape.updatedAt.nullable().optional(),
+  [OrderItemKeys.updatedAt]: OrderItemShape.updatedAt,
   [OrderItemKeys.deletedAt]: OrderItemShape.deletedAt.nullable().optional(),
 });

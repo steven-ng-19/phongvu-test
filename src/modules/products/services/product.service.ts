@@ -68,6 +68,13 @@ export class ProductService {
     };
   }
 
+  updateProductMapper(
+    param: ProductPrimaryKey,
+    data: UpdateProductParams,
+  ): Prisma.ProductUpdateArgs {
+    return this._mapper.update(param, data);
+  }
+
   async findOne(
     param: ProductFindByUniqueKeyParams | ProductFindByConditionParams,
   ): Promise<Product> {
@@ -91,6 +98,12 @@ export class ProductService {
       products,
       notFoundProduct: notFoundProduct.length,
     };
+  }
+
+  checkProductMapper(
+    param: ProductFindManyPrimaryKeys,
+  ): Prisma.ProductFindManyArgs {
+    return this._mapper.checkProduct(param);
   }
 
   async findMany(

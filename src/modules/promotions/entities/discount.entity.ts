@@ -16,5 +16,5 @@ export const DiscountEntity = DiscountModel.extend({
   [DiscountKeys.maxAmountPerOrder]: DiscountShape.maxAmountPerOrder,
   [DiscountKeys.deletedAt]: DiscountShape.deletedAt.nullable().optional(),
   [DiscountKeys.createdAt]: DiscountShape.createdAt,
-  [DiscountKeys.updatedAt]: DiscountShape.updatedAt.nullable().optional(),
+  [DiscountKeys.updatedAt]: DiscountShape.updatedAt,
 });

@@ -12,6 +12,6 @@ export const CartItemEntity = CartItemModel.extend({
     .nonnegative()
     .default(1),
   [CartItemKeys.createdAt]: CartItemShape.createdAt,
-  [CartItemKeys.updatedAt]: CartItemShape.updatedAt.nullable().optional(),
+  [CartItemKeys.updatedAt]: CartItemShape.updatedAt,
   [CartItemKeys.deletedAt]: CartItemShape.deletedAt.nullable().optional(),
 });

@@ -15,6 +15,6 @@ export const GiftEntity = GiftModel.extend({
   [GiftKeys.maxQuantityPerOrder]: GiftShape.maxQuantityPerOrder,
 
   [GiftKeys.createdAt]: GiftShape.createdAt,
-  [GiftKeys.updatedAt]: GiftShape.updatedAt.nullable().optional(),
+  [GiftKeys.updatedAt]: GiftShape.updatedAt,
   [GiftKeys.deletedAt]: GiftShape.deletedAt.nullable().optional(),
 });

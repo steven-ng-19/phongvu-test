@@ -32,6 +32,6 @@ export const UserEntity = UserModel.extend({
 
   [UserKeys.customerId]: UserShape.customerId.trim().optional().nullable(),
   [UserKeys.createdAt]: UserShape.createdAt,
-  [UserKeys.updatedAt]: UserShape.updatedAt.nullable().optional(),
+  [UserKeys.updatedAt]: UserShape.updatedAt,
   [UserKeys.deletedAt]: UserShape.deletedAt.nullable().optional(),
 });

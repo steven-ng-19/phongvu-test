@@ -51,7 +51,7 @@ export class CartItemController {
     const { findOptions, ...rest } = query;
     findOptions.where = {
       ...findOptions.where,
-      user: { clerkId: user.userId },
+      userId: user.localId,
     };
     const { count, data } = await this._cartItemService.findAll(query);
     return ResponseService.paginateResponse({ data, count, query: rest, req });
@@ -60,7 +60,7 @@ export class CartItemController {
   @Get(':id')
   @UseGuards(ClerkAuthGuard)
   async findOne(@RequestUser() user: ClerkPayload, @Param('id') id: string) {
-    return this._cartItemService.findOne({ id }, user.userId);
+    return this._cartItemService.findOne({ id }, user.localId);
   }
 
   @Post()
@@ -70,7 +70,7 @@ export class CartItemController {
     @Body(new ZodValidationPipe(CreateCartItemValidator))
     data: CreateCartItemDto,
   ) {
-    return this._cartItemService.create({ ...data, clerkId: user.userId });
+    return this._cartItemService.create(data, user.localId);
   }
 
   @Patch(':id')
@@ -81,7 +81,7 @@ export class CartItemController {
     @Body(new ZodValidationPipe(UpdateCartItemValidator))
     data: CreateCartItemDto,
   ) {
-    return this._cartItemService.update({ id }, data, user.userId);
+    return this._cartItemService.update({ id }, data, user.localId);
   }
 
   @Delete(':id')

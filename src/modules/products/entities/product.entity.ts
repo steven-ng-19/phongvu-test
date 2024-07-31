@@ -16,6 +16,6 @@ export const ProductEntity = ProductModel.extend({
   [ProductKeys.discount]: ProductShape.discount.optional().nullable(),
 
   [ProductKeys.createdAt]: ProductShape.createdAt,
-  [ProductKeys.updatedAt]: ProductShape.updatedAt.nullable().optional(),
+  [ProductKeys.updatedAt]: ProductShape.updatedAt,
   [ProductKeys.deletedAt]: ProductShape.deletedAt.nullable().optional(),
 });

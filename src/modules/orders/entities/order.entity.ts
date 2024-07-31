@@ -12,11 +12,11 @@ export const OrderEntity = OrderModel.extend({
   [OrderKeys.status]: OrderShape.status,
   [OrderKeys.totalPrice]: OrderShape.totalPrice,
   [OrderKeys.paymentMethod]: OrderShape.paymentMethod,
-  [OrderKeys.paymentId]: OrderShape.paymentId.optional(),
+  [OrderKeys.paymentId]: OrderShape.paymentId.nullable().optional(),
   [OrderKeys.paymentDetails]: OrderShape.paymentDetails.optional(),
-  [OrderKeys.notes]: OrderShape.notes.optional(),
+  [OrderKeys.notes]: OrderShape.notes.nullable().optional(),
 
   [OrderKeys.createdAt]: OrderShape.createdAt,
-  [OrderKeys.updatedAt]: OrderShape.updatedAt.nullable().optional(),
+  [OrderKeys.updatedAt]: OrderShape.updatedAt,
   [OrderKeys.deletedAt]: OrderShape.deletedAt.nullable().optional(),
 });

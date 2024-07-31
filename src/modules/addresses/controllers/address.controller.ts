@@ -73,7 +73,7 @@ export class AddressController {
     @RequestUser() user: ClerkPayload,
     @Body(new ZodValidationPipe(CreateAddressValidator)) data: CreateAddressDto,
   ) {
-    return this._addressService.create(data, user.userId);
+    return this._addressService.create(data, user.localId);
   }
 
   @UseGuards(ClerkAuthGuard)
@@ -84,7 +84,7 @@ export class AddressController {
   ) {
     return this._addressService.setDefault({
       id: addressId,
-      clerkId: user.userId,
+      userId: user.localId,
     });
   }
 }

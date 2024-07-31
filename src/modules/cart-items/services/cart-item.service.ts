@@ -26,16 +26,15 @@ export class CartItemService {
     private readonly _productService: ProductService,
   ) {}
 
-  async create(data: CreateCartItemDto): Promise<ResponseSuccess<CartItem>> {
-    const { clerkId, ...rest } = data;
-    const user = await this._userService.findOneByConditions({
-      clerkId,
-    });
+  async create(
+    data: CreateCartItemDto,
+    userId: string,
+  ): Promise<ResponseSuccess<CartItem>> {
     const product = await this._productService.findOne({
-      id: rest.productId,
+      id: data.productId,
     });
     const exitsMapper = this._mapper.findOne({
-      userId: user.id,
+      userId,
       productId: product.id,
     });
     const existCartItem =
@@ -43,7 +42,7 @@ export class CartItemService {
     if (existCartItem) {
       const result = await this.update(
         { id: existCartItem.id },
-        { quantity: existCartItem.quantity + rest.quantity },
+        { quantity: existCartItem.quantity + data.quantity },
       );
       return {
         success: true,
@@ -53,7 +52,7 @@ export class CartItemService {
 
     if (data.quantity > product.quantity)
       throw new BadRequestException(CART_ITEM_ERRORS.QUANTITY_INVALID);
-    const mapperData = this._mapper.create({ ...rest, userId: user.id });
+    const mapperData = this._mapper.create({ ...data, userId });
     const cartItem = await this._prismaService.cartItem.create(mapperData);
     return {
       success: true,
@@ -64,12 +63,9 @@ export class CartItemService {
   async update(
     param: CartItemPrimaryKey,
     data: UpdateCartItemParams,
-    clerkId?: string,
+    userId?: string,
   ): Promise<ResponseSuccess<CartItem>> {
-    const user = await this._userService.findOneByConditions({
-      clerkId,
-    });
-    const exitsMapper = this._mapper.findOne({ ...param, userId: user.id });
+    const exitsMapper = this._mapper.findOne({ ...param, userId });
     const existCartItem =
       await this._prismaService.cartItem.findFirst(exitsMapper);
     if (!existCartItem)
@@ -89,12 +85,9 @@ export class CartItemService {
 
   async findOne(
     param: CartItemFindByUniqueKey | CartItemFindByCondition,
-    clerkId?: string,
+    userId?: string,
   ): Promise<CartItem> {
-    const user = await this._userService.findOneByConditions({
-      clerkId,
-    });
-    const mapperData = this._mapper.findOne({ ...param, userId: user.id });
+    const mapperData = this._mapper.findOne({ ...param, userId });
     const cartItem = await this._prismaService.cartItem.findFirst(mapperData);
     if (!cartItem) throw new BadRequestException(CART_ITEM_ERRORS.NOT_FOUND);
     return cartItem;

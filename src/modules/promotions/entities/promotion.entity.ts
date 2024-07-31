@@ -19,6 +19,6 @@ export const PromotionEntity = PromotionModel.extend({
   [PromotionKeys.applyOn]: PromotionShape.applyOn.nullable().optional(),
 
   [PromotionKeys.createdAt]: PromotionShape.createdAt,
-  [PromotionKeys.updatedAt]: PromotionShape.updatedAt.nullable().optional(),
+  [PromotionKeys.updatedAt]: PromotionShape.updatedAt,
   [PromotionKeys.deletedAt]: PromotionShape.deletedAt.nullable().optional(),
 });

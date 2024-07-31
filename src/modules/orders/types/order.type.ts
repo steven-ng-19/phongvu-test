@@ -31,7 +31,11 @@ const UPDATE_ORDER_PARAM_WITHOUT_FIELDS = [
   'orderItems',
 ] as const;
 
-const FIND_PARAM_WITHOUT_FIELDS = ['addressData', 'orderItems'] as const;
+const FIND_PARAM_WITHOUT_FIELDS = [
+  'addressData',
+  'orderItems',
+  'paymentDetails',
+] as const;
 
 export type CreateOrderParams = EntityWithoutFields<
   Order,

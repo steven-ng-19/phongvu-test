@@ -1,5 +1,6 @@
 import {
   CreateOrderParams,
+  Order,
   OrderFindByConditionParams,
   OrderFindByUniqueKeyParams,
   OrderPrimaryKey,
@@ -13,12 +14,13 @@ import { Prisma } from '@prisma/client';
 @Injectable()
 export class OrderMapper {
   create(data: CreateOrderParams): Prisma.OrderCreateArgs {
-    const { addressData, orderItems, ...rest } = data;
+    const { addressData, orderItems, paymentDetails, ...rest } = data;
     return {
       data: {
         ...rest,
-        addressData: addressData,
-        orderItems: {
+        paymentDetails: paymentDetails as unknown as Prisma.JsonObject,
+        addressData: addressData!,
+        orderItems: orderItems && {
           createMany: {
             data: orderItems,
           },
@@ -43,8 +45,22 @@ export class OrderMapper {
     };
   }
 
-  findOne(
-    param: OrderFindByUniqueKeyParams | OrderFindByConditionParams,
+  findOne(param: OrderFindByUniqueKeyParams): Prisma.OrderFindManyArgs {
+    const { excludes = {}, ...rest } = param;
+    return {
+      where: {
+        ...rest,
+        ...Object.fromEntries(
+          Object.entries(excludes).map(([key, value]) => [
+            key,
+            { notIn: value },
+          ]),
+        ),
+      },
+    };
+  }
+  findOneByCondition(
+    param: OrderFindByConditionParams,
   ): Prisma.OrderFindManyArgs {
     const { excludes = {}, ...rest } = param;
     return {
@@ -59,7 +75,6 @@ export class OrderMapper {
       },
     };
   }
-
   findByPrimaryKey(param: OrderPrimaryKey): Prisma.OrderFindManyArgs {
     return {
       where: {
@@ -72,7 +87,7 @@ export class OrderMapper {
   }
 
   findAll(
-    param: BaseQueryParamsDto<Prisma.OrderWhereInput>,
+    param: BaseQueryParamsDto<OrderFindByConditionParams>,
   ): Prisma.OrderFindManyArgs {
     const { findOptions, ...rest } = param;
     findOptions.where = {

@@ -48,10 +48,9 @@ export class AddressService {
 
   async create(
     data: CreateAddressDto,
-    clerkId: string,
+    userId: string,
   ): Promise<ResponseSuccess<Address>> {
-    const user = await this._userService.findOneByConditions({ clerkId });
-    const mapperData = this._mapper.create({ ...data, userId: user.id });
+    const mapperData = this._mapper.create({ ...data, userId });
     const address = await this._prismaService.address.create(mapperData);
     return {
       success: true,
