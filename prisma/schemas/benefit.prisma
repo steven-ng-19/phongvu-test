@@ -1,13 +1,14 @@
 model Benefit {
-    id         String @id @default(uuid()) @db.VarChar(36)
-    discountId String @unique @map("discount_id") @db.VarChar(36)
+    id          String @id @default(uuid()) @db.VarChar(36)
+    promotionId String @unique @map("promotion_id") @db.VarChar(36)
 
     createdAt DateTime  @default(now()) @map("created_at")
-    updatedAt DateTime? @map("updated_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
     deletedAt DateTime? @map("deleted_at")
 
-    discount Discount @relation(fields: [discountId], references: [id])
-    gifts    Gift[]
+    discount  Discount?
+    promotion Promotion @relation(fields: [promotionId], references: [id])
+    gifts     Gift[]
 
     @@map("benefits")
 }

@@ -1,17 +1,24 @@
+import { ALLOWED_STATUS_ADMIN, ALLOWED_STATUS_USER } from '../constants';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Order, OrderFindByConditionParams } from '../types';
+import { Order, Prisma } from '@prisma/client';
+import {
+  OrderFindByConditionParams,
+  OrderFindByUniqueKeyParams,
+  OrderPrimaryKey,
+  UpdateOrderParams,
+} from '../types';
 
 import { ADDRESS_ERRORS } from 'src/common/contents/errors/address.error';
 import { Address } from 'src/modules/addresses/types';
 import { AddressService } from 'src/modules/addresses/services';
 import { BaseQueryParamsDto } from 'src/common/dtos';
 import { CART_ITEM_ERRORS } from 'src/common/contents/errors/cart-item.error';
+import { CartItemService } from 'src/modules/cart-items/services';
 import { CreateOrderDto } from '../dtos';
 import { Json } from '../entities';
 import { ORDER_ERRORS } from 'src/common/contents/errors/order.error';
 import { OrderMapper } from '../mappers';
 import { PRODUCT_ERRORS } from 'src/common/contents/errors/product.error';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { ProductService } from 'src/modules/products/services';
 import { ResponseFindMany } from 'src/common/types/respone-find-many.type';
@@ -26,6 +33,7 @@ export class OrderService {
     private readonly _userService: UserService,
     private readonly _productService: ProductService,
     private readonly _addressService: AddressService,
+    private readonly _cartItemService: CartItemService,
   ) {}
 
   async create(
@@ -61,34 +69,23 @@ export class OrderService {
               throw new BadRequestException(CART_ITEM_ERRORS.QUANTITY_INVALID);
 
             const productDiscount = product!.discount
-              ? (product!.discount * product!.price) / 100
+              ? Math.round(((product!.discount * product!.price) / 100) * 100) /
+                100
               : 0;
 
-            if (productDiscount !== item.discount)
-              throw new BadRequestException(ORDER_ERRORS.DISCOUNT_INCORECT);
-
             const totalPrice = product!.price * item.quantity;
-            if (totalPrice !== item.totalPrice)
-              throw new BadRequestException(ORDER_ERRORS.TOTAL_PRICE_INCORECT);
-
             const totalPriceWithDiscount = totalPrice - productDiscount;
 
-            if (totalPriceWithDiscount != item.totalPriceWithDiscount)
-              throw new BadRequestException(
-                ORDER_ERRORS.TOTAL_PRICE_WITH_DISCOUNT_INCORECT,
-              );
-
             productTotalPrice += totalPriceWithDiscount;
+
             return {
               ...item,
+              totalPrice: totalPrice,
+              totalPriceWithDiscount: totalPriceWithDiscount,
+              discount: productDiscount,
               productData: product!,
             };
           });
-
-          if (productTotalPrice != data.totalPrice)
-            throw new BadRequestException(
-              ORDER_ERRORS.ORDER_TOTAL_PRICE_INCORECT,
-            );
 
           const address = await this._addressService.findOneByConditions({
             userId,
@@ -110,6 +107,12 @@ export class OrderService {
                   { quantity: productQuantity },
                 );
 
+              const cartItemMapper = this._cartItemService.deleteMapper({
+                userId: userId,
+                productId: product.id,
+              });
+
+              await trx.cartItem.deleteMany(cartItemMapper);
               await trx.product.update(updateProductMapper);
             }),
           );
@@ -117,6 +120,7 @@ export class OrderService {
           const mapperData = this._mapper.create({
             ...rest,
             userId,
+            totalPrice: productTotalPrice,
             addressData: addressRest,
             orderItems: orderItemsData,
           });
@@ -126,8 +130,8 @@ export class OrderService {
             success: true,
             data: {
               ...orderRest,
-              addressData: addressData as (Address & Json) | undefined,
-              paymentDetails: paymentDetails as (string & Json) | undefined,
+              addressData: addressData,
+              paymentDetails: paymentDetails,
             },
           };
         },
@@ -146,17 +150,95 @@ export class OrderService {
     const count = await this._prismaService.order.count({
       where: mapperData.where,
     });
-    const orderList = orders.map((order) => {
-      const { paymentDetails, addressData, ...orderRest } = order;
-      return {
-        ...orderRest,
-        addressData: addressData as (Address & Json) | undefined,
-        paymentDetails: paymentDetails as (string & Json) | undefined,
-      };
-    });
     return {
-      data: orderList,
+      data: orders,
       count,
     };
+  }
+
+  async findOneByKey(
+    param: OrderFindByUniqueKeyParams,
+    userId: string,
+  ): Promise<Order> {
+    const mapperData = this._mapper.findOne({ ...param, userId });
+    const order = await this._prismaService.order.findFirst(mapperData);
+    if (!order) throw new BadRequestException(ORDER_ERRORS.NOT_FOUND);
+    const { paymentDetails, addressData, ...orderRest } = order;
+    return {
+      ...orderRest,
+      addressData: addressData,
+      paymentDetails: paymentDetails,
+    };
+  }
+
+  async findOneByConditions(param: OrderFindByConditionParams): Promise<Order> {
+    const mapperData = this._mapper.findOneByCondition(param);
+    const order = await this._prismaService.order.findFirst(mapperData);
+    if (!order) throw new BadRequestException(ORDER_ERRORS.NOT_FOUND);
+    const { paymentDetails, addressData, ...orderRest } = order;
+    return {
+      ...orderRest,
+      addressData: addressData,
+      paymentDetails: paymentDetails,
+    };
+  }
+
+  async changeStatus(
+    param: OrderPrimaryKey,
+    data: UpdateOrderParams,
+    userId?: string,
+    isAdmin: boolean = false,
+  ): Promise<ResponseSuccess<Order>> {
+    if (!isAdmin && userId) {
+      const existOrder = await this.findOneByKey(param, userId);
+      if (!ALLOWED_STATUS_USER[existOrder.status].includes(data.status)) {
+        throw new BadRequestException(ORDER_ERRORS.STATUS_INVALID);
+      }
+    }
+    const existOrder = await this.findOneByConditions(param);
+    if (!ALLOWED_STATUS_ADMIN[existOrder.status].includes(data.status)) {
+      throw new BadRequestException(ORDER_ERRORS.STATUS_INVALID);
+    }
+    const mapperData = this._mapper.update(param, data);
+    const updateOrder = await this._prismaService.order.update(mapperData);
+    return {
+      success: true,
+    };
+  }
+
+  async delete(param: OrderPrimaryKey): Promise<ResponseSuccess<Order>> {
+    return await this._prismaService.$transaction(async (trx) => {
+      const order = await trx.order.findFirst({
+        where: param,
+        include: { orderItems: true },
+      });
+      if (!order) throw new BadRequestException(ORDER_ERRORS.NOT_FOUND);
+      await trx.order.update({
+        where: param,
+        data: {
+          orderItems: { deleteMany: {} },
+        },
+      });
+      const deleteMapperData = this._mapper.delete(param);
+      await trx.order.delete(deleteMapperData);
+
+      const { orderItems } = order;
+      await Promise.all(
+        orderItems.map(async (item) => {
+          const product = await trx.product.findFirst({
+            where: { id: item.productId },
+          });
+          if (!product) throw new BadRequestException(PRODUCT_ERRORS.NOT_FOUND);
+          const updateProductMapper = this._productService.updateProductMapper(
+            { id: item.productId },
+            { quantity: item.quantity + product.quantity },
+          );
+          await trx.product.update(updateProductMapper);
+        }),
+      );
+      return {
+        success: true,
+      };
+    });
   }
 }

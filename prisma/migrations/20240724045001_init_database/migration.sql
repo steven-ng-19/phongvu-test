@@ -12,6 +12,9 @@ CREATE TABLE "addresses" (
     "latitude" INTEGER,
     "longitude" INTEGER,
     "is_default" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "addresses_pkey" PRIMARY KEY ("id")
 );
@@ -20,6 +23,9 @@ CREATE TABLE "addresses" (
 CREATE TABLE "benefits" (
     "id" VARCHAR(36) NOT NULL,
     "discount_id" VARCHAR(36) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "benefits_pkey" PRIMARY KEY ("id")
 );
@@ -31,6 +37,9 @@ CREATE TABLE "cards" (
     "pm" VARCHAR(255) NOT NULL,
     "type" TEXT NOT NULL,
     "is_default" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "cards_pkey" PRIMARY KEY ("id")
 );
@@ -41,6 +50,9 @@ CREATE TABLE "cart_items" (
     "user_id" VARCHAR(36) NOT NULL,
     "product_id" VARCHAR(36) NOT NULL,
     "quantity" INTEGER NOT NULL DEFAULT 1,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "cart_items_pkey" PRIMARY KEY ("id")
 );
@@ -53,6 +65,9 @@ CREATE TABLE "categories" (
     "description" TEXT NOT NULL,
     "image" VARCHAR(100) NOT NULL,
     "isDeprecated" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "categories_pkey" PRIMARY KEY ("id")
 );
@@ -63,6 +78,9 @@ CREATE TABLE "conditions" (
     "order_value_min" DOUBLE PRECISION NOT NULL,
     "order_value_max" DOUBLE PRECISION NOT NULL,
     "min_quantity" INTEGER NOT NULL DEFAULT 1,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "conditions_pkey" PRIMARY KEY ("id")
 );
@@ -74,6 +92,9 @@ CREATE TABLE "discounts" (
     "maxAmount" DOUBLE PRECISION NOT NULL,
     "flat" INTEGER,
     "max_amount_per_order" DOUBLE PRECISION NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "discounts_pkey" PRIMARY KEY ("id")
 );
@@ -86,6 +107,9 @@ CREATE TABLE "galleries" (
     "url" TEXT NOT NULL,
     "type" TEXT,
     "order" INTEGER NOT NULL DEFAULT 0,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "galleries_pkey" PRIMARY KEY ("id")
 );
@@ -99,6 +123,9 @@ CREATE TABLE "gifts" (
     "image" VARCHAR(100) NOT NULL,
     "quantity" INTEGER NOT NULL,
     "max_quantity_per_order" INTEGER NOT NULL DEFAULT 1,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "gifts_pkey" PRIMARY KEY ("id")
 );
@@ -112,6 +139,9 @@ CREATE TABLE "order_items" (
     "discount" DOUBLE PRECISION,
     "total_price" DOUBLE PRECISION NOT NULL,
     "total_price_with_discount" DOUBLE PRECISION,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "order_items_pkey" PRIMARY KEY ("order_id","product_id")
 );
@@ -120,13 +150,16 @@ CREATE TABLE "order_items" (
 CREATE TABLE "orders" (
     "id" VARCHAR(36) NOT NULL,
     "userId" VARCHAR(36) NOT NULL,
-    "addressId" VARCHAR(36) NOT NULL,
     "status" VARCHAR(20) NOT NULL,
     "total_price" DOUBLE PRECISION NOT NULL,
     "payment_method" VARCHAR(20) NOT NULL,
     "payment_id" VARCHAR(255),
-    "paymentDetails" JSONB,
+    "payment_details" JSONB,
+    "address_data" JSONB NOT NULL,
     "notes" VARCHAR(255) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "orders_pkey" PRIMARY KEY ("id")
 );
@@ -143,7 +176,9 @@ CREATE TABLE "products" (
     "quantity" INTEGER NOT NULL DEFAULT 0,
     "image" TEXT NOT NULL,
     "discount" INTEGER DEFAULT 0,
-    "deletedAt" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "products_pkey" PRIMARY KEY ("id")
 );
@@ -157,8 +192,11 @@ CREATE TABLE "promotions" (
     "description" TEXT NOT NULL,
     "image" VARCHAR(100) NOT NULL,
     "end_date" TIMESTAMP(3) NOT NULL,
-    "isDefault" BOOLEAN NOT NULL DEFAULT false,
+    "is_default" BOOLEAN NOT NULL DEFAULT false,
     "apply_on" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "promotions_pkey" PRIMARY KEY ("id")
 );
@@ -166,12 +204,10 @@ CREATE TABLE "promotions" (
 -- CreateTable
 CREATE TABLE "users" (
     "id" VARCHAR(36) NOT NULL,
+    "clerk_id" TEXT NOT NULL,
     "userName" VARCHAR(50) NOT NULL,
     "email" VARCHAR(50) NOT NULL,
     "phone" VARCHAR(20) NOT NULL,
-    "password" VARCHAR(72) NOT NULL,
-    "is_email_verifiled" BOOLEAN NOT NULL DEFAULT false,
-    "is_phone_verifiled" BOOLEAN NOT NULL DEFAULT false,
     "first_name" VARCHAR(50) NOT NULL,
     "last_name" VARCHAR(50),
     "avatar" TEXT,
@@ -179,10 +215,11 @@ CREATE TABLE "users" (
     "role" VARCHAR(10) NOT NULL,
     "date_of_birth" TIMESTAMP(3),
     "gender" VARCHAR(10) NOT NULL,
-    "email_verification_token" TEXT,
     "reset_password_token" TEXT,
     "customer_id" VARCHAR(100),
-    "registration_tokens" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -225,9 +262,6 @@ ALTER TABLE "order_items" ADD CONSTRAINT "order_items_product_id_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "orders" ADD CONSTRAINT "orders_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "orders" ADD CONSTRAINT "orders_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "addresses"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "products" ADD CONSTRAINT "products_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "categories"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

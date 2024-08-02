@@ -81,4 +81,15 @@ export class CartItemMapper {
       },
     };
   }
+
+  deleteByCondition(
+    param: CartItemFindByCondition,
+  ): Prisma.CartItemDeleteManyArgs {
+    return {
+      where: {
+        productId: param.productId,
+        userId: param.userId,
+      },
+    };
+  }
 }

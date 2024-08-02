@@ -1,5 +1,6 @@
 model Discount {
-    id String @id @default(uuid()) @db.VarChar(36)
+    id        String @id @default(uuid()) @db.VarChar(36)
+    benefitId String @unique @map("benefit_id") @db.VarChar(36)
 
     percent           Int
     maxAmount         Float
@@ -7,10 +8,10 @@ model Discount {
     maxAmountPerOrder Float @map("max_amount_per_order")
 
     createdAt DateTime  @default(now()) @map("created_at")
-    updatedAt DateTime? @map("updated_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
     deletedAt DateTime? @map("deleted_at")
 
-    benefit Benefit?
+    benefit Benefit @relation(fields: [benefitId], references: [id])
 
     @@map("discounts")
 }

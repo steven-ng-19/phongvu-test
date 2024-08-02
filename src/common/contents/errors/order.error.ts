@@ -15,4 +15,12 @@ export const ORDER_ERRORS = {
     code: 'ORDER_TOTAL_PRICE_INCORECT',
     message: 'Order total price is incorect',
   },
+  NOT_FOUND: {
+    code: 'Not Found',
+    message: 'Order not found',
+  },
+  STATUS_INVALID: {
+    code: 'Status Invalid',
+    message: 'You cannot change to this status',
+  },
 };

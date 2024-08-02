@@ -5,7 +5,7 @@ model CartItem {
 
     quantity  Int       @default(1)
     createdAt DateTime  @default(now()) @map("created_at")
-    updatedAt DateTime  @map("updated_at")
+    updatedAt DateTime? @updatedAt @map("updated_at")
     deletedAt DateTime? @map("deleted_at")
 
     user    User    @relation(fields: [userId], references: [id])

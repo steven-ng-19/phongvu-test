@@ -107,6 +107,10 @@ export class CartItemService {
     };
   }
 
+  deleteMapper(param: CartItemFindByCondition): Prisma.CartItemDeleteManyArgs {
+    return this._mapper.deleteByCondition(param);
+  }
+
   async delete(param: CartItemPrimaryKey): Promise<ResponseSuccess<CartItem>> {
     const mapperData = this._mapper.delete(param);
     const cartItem = await this._prismaService.cartItem.update(mapperData);

@@ -1,15 +1,16 @@
 model Condition {
-    id String @id @default(uuid()) @db.VarChar(36)
+    id          String @id @default(uuid()) @db.VarChar(36)
+    promotionId String @unique @map("promotion_id") @db.VarChar(36)
 
     orderValueMin Float @map("order_value_min")
     orderValueMax Float @map("order_value_max")
     minQuantity   Int   @default(1) @map("min_quantity")
 
     createdAt DateTime  @default(now()) @map("created_at")
-    updatedAt DateTime? @map("updated_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
     deletedAt DateTime? @map("deleted_at")
 
-    promotion Promotion?
+    promotion Promotion @relation(fields: [promotionId], references: [id])
 
     @@map("conditions")
 }

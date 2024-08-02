@@ -6,6 +6,8 @@ import {
   JWT_REFRESH_TOKEN,
 } from '../constants';
 
+import { User } from '@prisma/client';
+
 export type TokenType =
   | typeof ADMIN_JWT_TOKEN
   | typeof JWT_ACCESS_TOKEN
@@ -47,4 +49,5 @@ export type ClerkPayload = {
   userId: string;
   userName: string | null;
   localId: string;
+  localUser: User;
 };

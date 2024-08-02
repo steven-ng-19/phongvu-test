@@ -1,15 +1,26 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
+
 import { CONFIG_VAR } from 'src/config';
+import { ClerkPayload } from 'src/modules/auth/types';
 import { ConfigService } from '@nestjs/config';
-import { Injectable } from '@nestjs/common';
+import { CreatePaymentIntentDto } from '../dtos';
+import { Order } from './../../../modules/orders/types/order.type';
+import { OrderService } from 'src/modules/orders/services';
+import { STRIPE_ERRORS } from 'src/common/contents/errors/stripe.error';
 import Stripe from 'stripe';
-import { User } from 'src/modules/users/types';
+import { User } from '@prisma/client';
 import { UserKeys } from 'src/modules/users/entities';
+import { UserService } from 'src/modules/users/services';
 
 @Injectable()
 export class StripeService {
   private stripe: Stripe;
 
-  constructor(private _configService: ConfigService) {
+  constructor(
+    private _configService: ConfigService,
+    private readonly _userService: UserService,
+    private readonly _orderService: OrderService,
+  ) {
     this.stripe = new Stripe(
       _configService.getOrThrow(CONFIG_VAR.STRIPE_API_SECRET_KEY),
       {
@@ -19,12 +30,18 @@ export class StripeService {
   }
 
   async createCustomer(user: User): Promise<Stripe.Customer> {
+    const { firstName, lastName, email, phone, dob } = user;
     const params: Stripe.CustomerCreateParams = {
-      name: `${user.firstName} ${user.lastName}`,
-      email: user.email,
-      phone: user.phone,
+      name: `${firstName} ${lastName}`,
+      email: email,
+      phone: phone,
       metadata: {
-        userId: user[UserKeys.id].toString(),
+        dob: dob && dob.toDateString(),
+        localId: user.id,
+        clerkId: user.clerkId,
+        username: user.userName,
+        gender: user.gender,
+        role: user.role,
       },
     };
     return this.stripe.customers.create(params);
@@ -52,29 +69,53 @@ export class StripeService {
     return this.stripe.paymentMethods.detach(paymentMethodId);
   }
 
-  async createPaymentIntent({
-    customerId,
-    paymentMethodId,
-    amount,
-    metadata = {},
-    confirm = true,
-  }: {
-    customerId: string;
-    paymentMethodId: string;
-    amount: number;
-    metadata: Stripe.MetadataParam;
-    confirm?: boolean;
-  }) {
-    const params: Stripe.PaymentIntentCreateParams = {
-      amount: amount * 100,
-      currency: 'aud',
-      customer: customerId,
-      payment_method: paymentMethodId,
-      metadata,
-      confirm,
-    };
+  async createPaymentIntent(
+    data: CreatePaymentIntentDto,
+    user: ClerkPayload,
+  ): Promise<Stripe.PaymentIntent> {
+    if (!user.localUser.customerId) {
+      const customer = await this.createCustomer(user.localUser);
+      data.customer = customer.id;
+      await this._userService.update(
+        { id: user.localId },
+        { customerId: customer.id },
+      );
+    }
 
-    return this.stripe.paymentIntents.create(params);
+    const creaetOrder = await this._orderService.create(
+      data.order,
+      user.localId,
+    );
+    data.amount =
+      data.amount == creaetOrder.data!.totalPrice
+        ? data.amount
+        : creaetOrder.data!.totalPrice * 100;
+    data.metadata = {
+      orderId: creaetOrder.data!.id,
+    };
+    const { order, ...rest } = data;
+
+    const paymentIntent = await this.stripe.paymentIntents.create(rest);
+    if (!paymentIntent) {
+      await this._orderService.delete({ id: creaetOrder.data!.id });
+      throw new BadRequestException(STRIPE_ERRORS.CREATED_PAYMENT_INTENT_ERROR);
+    }
+
+    return paymentIntent;
+  }
+
+  constructEvent(payload: Buffer | string, signature: string, secret: string) {
+    try {
+      const event = this.stripe.webhooks.constructEvent(
+        payload,
+        signature,
+        secret,
+      );
+      return event;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException(error);
+    }
   }
 
   async retrieveCharge(chargeId: string): Promise<Stripe.Charge> {

@@ -6,6 +6,7 @@ export const ConfigSchema = z
     // STRIPE
     [CONFIG_VAR.STRIPE_API_SECRET_KEY]: z.string().trim(),
     [CONFIG_VAR.STRIPE_PUBLIC_KEY]: z.string().trim(),
+    [CONFIG_VAR.STRIPE_WEBHOOK_SECRET_KEY]: z.string().trim(),
 
     //ADMIN ACCOUNT
     [CONFIG_VAR.DEFAULT_ADMIN_USERNAME]: z.string().trim(),

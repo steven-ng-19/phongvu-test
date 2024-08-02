@@ -10,6 +10,7 @@ export const UpdateUserValidator = UserEntity.pick({
   lastName: true,
   phone: true,
   gender: true,
+  customerId: true,
 }).partial();
 
 export class UpdateUserDto extends createZodDto(UpdateUserValidator) {}

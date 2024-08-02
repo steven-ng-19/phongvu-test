@@ -18,11 +18,11 @@ import { ZodValidationPipe } from 'src/common/pipes';
 import { DirectFilterPipe } from '@chax-at/prisma-filter';
 import { ORDER_FILTER_FIELDS } from '../constants';
 import { BaseQueryParamsDto } from 'src/common/dtos';
-import { Prisma } from '@prisma/client';
+import { Order, Prisma } from '@prisma/client';
 import { ResponseService } from 'src/shared/response/response.service';
 import { ApiPaginateResponse } from 'src/shared/response/dtos';
 import { Request } from 'express';
-import { Order, OrderFindByConditionParams } from '../types';
+import { OrderFindByConditionParams } from '../types';
 
 @Controller('orders')
 export class OrderController {

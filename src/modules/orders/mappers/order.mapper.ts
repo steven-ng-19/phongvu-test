@@ -57,6 +57,9 @@ export class OrderMapper {
           ]),
         ),
       },
+      include: {
+        orderItems: true,
+      },
     };
   }
   findOneByCondition(
@@ -99,6 +102,12 @@ export class OrderMapper {
       include: {
         orderItems: true,
       },
+    };
+  }
+
+  delete(param: OrderPrimaryKey): Prisma.OrderDeleteArgs {
+    return {
+      where: param,
     };
   }
 }

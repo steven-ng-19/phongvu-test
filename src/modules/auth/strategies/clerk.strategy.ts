@@ -41,6 +41,7 @@ export class ClerkStategy extends PassportStrategy(Strategy, CLERK_STRATEGY) {
       return {
         ...payload,
         localId: user.id,
+        localUser: user,
       };
     } catch (error) {
       console.log(error);

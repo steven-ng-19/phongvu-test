@@ -8,7 +8,6 @@ import { createZodDto } from '@anatine/zod-nestjs';
 
 export const CreateOrderValidator = OrderEntity.pick({
   status: true,
-  totalPrice: true,
   paymentMethod: true,
   paymentId: true,
   paymentDetails: true,
@@ -17,19 +16,8 @@ export const CreateOrderValidator = OrderEntity.pick({
   addressId: Zod.string().uuid().trim(),
   orderItems: Zod.array(
     OrderItemEntity.pick({
-      discount: true,
       productId: true,
       quantity: true,
-      totalPrice: true,
-      totalPriceWithDiscount: true,
-    }).extend({
-      productData: ProductEntity.omit({
-        createdAt: true,
-        updatedAt: true,
-        deletedAt: true,
-      })
-        .partial()
-        .optional(),
     }),
   ),
 });
