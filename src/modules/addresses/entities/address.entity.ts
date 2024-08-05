@@ -1,5 +1,5 @@
-import { AdderssModel } from './address-model.entity';
 import { parsePhoneNumber } from 'awesome-phonenumber';
+import { AdderssModel } from './address-model.entity';
 
 export const AddressShape = AdderssModel.shape;
 export const AddressKeys = AdderssModel.keyof().enum;
@@ -12,6 +12,7 @@ export const AddressEntity = AdderssModel.extend({
   [AddressKeys.country]: AddressShape.country.trim().min(3).max(200),
   [AddressKeys.ward]: AddressShape.ward.trim().min(3).max(200),
   [AddressKeys.fullName]: AddressShape.fullName.trim().min(3).max(100),
+  // NOTE: Why validate phone in this?
   [AddressKeys.phone]: AddressShape.phone.refine((phone) => {
     const phoneNumber = parsePhoneNumber(phone);
     return phoneNumber.valid ? phoneNumber.number : null;

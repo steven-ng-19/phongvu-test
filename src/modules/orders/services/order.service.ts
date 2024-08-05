@@ -1,29 +1,28 @@
-import { ALLOWED_STATUS_ADMIN, ALLOWED_STATUS_USER } from '../constants';
+import { ADDRESS_ERRORS } from 'src/common/contents/errors/address.error';
+import { CART_ITEM_ERRORS } from 'src/common/contents/errors/cart-item.error';
+import { ORDER_ERRORS } from 'src/common/contents/errors/order.error';
+import { PRODUCT_ERRORS } from 'src/common/contents/errors/product.error';
+import { BaseQueryParamsDto } from 'src/common/dtos';
+import { ResponseSuccess } from 'src/common/types';
+import { ResponseFindMany } from 'src/common/types/respone-find-many.type';
+import { AddressService } from 'src/modules/addresses/services';
+import { Address } from 'src/modules/addresses/types';
+import { CartItemService } from 'src/modules/cart-items/services';
+import { ProductService } from 'src/modules/products/services';
+import { UserService } from 'src/modules/users/services';
+import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Order, Prisma } from '@prisma/client';
+import { ALLOWED_STATUS_ADMIN, ALLOWED_STATUS_USER } from '../constants';
+import { CreateOrderDto } from '../dtos';
+import { Json } from '../entities';
+import { OrderMapper } from '../mappers';
 import {
   OrderFindByConditionParams,
   OrderFindByUniqueKeyParams,
   OrderPrimaryKey,
   UpdateOrderParams,
 } from '../types';
-
-import { ADDRESS_ERRORS } from 'src/common/contents/errors/address.error';
-import { Address } from 'src/modules/addresses/types';
-import { AddressService } from 'src/modules/addresses/services';
-import { BaseQueryParamsDto } from 'src/common/dtos';
-import { CART_ITEM_ERRORS } from 'src/common/contents/errors/cart-item.error';
-import { CartItemService } from 'src/modules/cart-items/services';
-import { CreateOrderDto } from '../dtos';
-import { Json } from '../entities';
-import { ORDER_ERRORS } from 'src/common/contents/errors/order.error';
-import { OrderMapper } from '../mappers';
-import { PRODUCT_ERRORS } from 'src/common/contents/errors/product.error';
-import { PrismaService } from 'src/shared/prisma/prisma.service';
-import { ProductService } from 'src/modules/products/services';
-import { ResponseFindMany } from 'src/common/types/respone-find-many.type';
-import { ResponseSuccess } from 'src/common/types';
-import { UserService } from 'src/modules/users/services';
 
 @Injectable()
 export class OrderService {
@@ -208,6 +207,7 @@ export class OrderService {
 
   async delete(param: OrderPrimaryKey): Promise<ResponseSuccess<Order>> {
     return await this._prismaService.$transaction(async (trx) => {
+      // NOTE: Not handle check logic in transaction
       const order = await trx.order.findFirst({
         where: param,
         include: { orderItems: true },
@@ -223,8 +223,10 @@ export class OrderService {
       await trx.order.delete(deleteMapperData);
 
       const { orderItems } = order;
+      // NOTE: In transaction, promise all Not Working
       await Promise.all(
         orderItems.map(async (item) => {
+          // NOTE: Not check with multiple request DB in for_loop
           const product = await trx.product.findFirst({
             where: { id: item.productId },
           });

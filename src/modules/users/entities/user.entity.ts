@@ -1,5 +1,5 @@
-import { UserModel } from './user-model.entity';
 import { parsePhoneNumber } from 'awesome-phonenumber';
+import { UserModel } from './user-model.entity';
 
 export const UserShape = UserModel.shape;
 export const UserKeys = UserModel.keyof().enum;
@@ -24,6 +24,7 @@ export const UserEntity = UserModel.extend({
   [UserKeys.avatar]: UserShape.avatar.trim().optional().nullable(),
   [UserKeys.cover]: UserShape.cover.trim().nullable().optional(),
   [UserKeys.role]: UserShape.role,
+  // NOTE: complex validate in entity
   [UserKeys.dob]: UserShape.dob
     .refine((date) => new Date(date) < new Date())
     .nullable()

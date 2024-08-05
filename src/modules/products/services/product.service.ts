@@ -1,5 +1,14 @@
+import { PRODUCT_ERRORS } from 'src/common/contents/errors/product.error';
+import { BaseQueryParamsDto } from 'src/common/dtos';
+import { ResponseSuccess } from 'src/common/types';
+import { ResponseFindMany } from 'src/common/types/respone-find-many.type';
+import { generateSlug } from 'src/common/utils';
+import { CategoryService } from 'src/modules/categories/services';
+import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Prisma, Product } from '@prisma/client';
 import { CreateProductDto, FindProductDto } from '../dtos';
+import { ProductMapper } from '../mappers';
 import {
   CreateProductParams,
   ProductFindByConditionParams,
@@ -9,16 +18,6 @@ import {
   ProductPrimaryKey,
   UpdateProductParams,
 } from '../types';
-import { Prisma, Product } from '@prisma/client';
-
-import { BaseQueryParamsDto } from 'src/common/dtos';
-import { CategoryService } from 'src/modules/categories/services';
-import { PRODUCT_ERRORS } from 'src/common/contents/errors/product.error';
-import { PrismaService } from 'src/shared/prisma/prisma.service';
-import { ProductMapper } from '../mappers';
-import { ResponseFindMany } from 'src/common/types/respone-find-many.type';
-import { ResponseSuccess } from 'src/common/types';
-import { generateSlug } from 'src/common/utils';
 
 @Injectable()
 export class ProductService {
@@ -29,9 +28,10 @@ export class ProductService {
   ) {}
 
   async createProduct(
+    // NOTE: Write DTO form params type in service
     data: CreateProductParams,
   ): Promise<ResponseSuccess<Product>> {
-    const category = await this._categoryService.findOneByKey({
+    await this._categoryService.findOneByKey({
       id: data.categoryId,
     });
     const existProductMapper = this._mapper.findOne({

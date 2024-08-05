@@ -1,21 +1,20 @@
+import { CART_ITEM_ERRORS } from 'src/common/contents/errors/cart-item.error';
+import { BaseQueryParamsDto } from 'src/common/dtos';
+import { ResponseSuccess } from 'src/common/types';
+import { ResponseFindMany } from 'src/common/types/respone-find-many.type';
+import { ProductService } from 'src/modules/products/services';
+import { UserService } from 'src/modules/users/services';
+import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CartItem, Prisma } from '@prisma/client';
+import { CreateCartItemDto } from '../dtos';
+import { CartItemMapper } from '../mappers';
 import {
   CartItemFindByCondition,
   CartItemFindByUniqueKey,
   CartItemPrimaryKey,
   UpdateCartItemParams,
 } from '../types';
-
-import { BaseQueryParamsDto } from 'src/common/dtos';
-import { CART_ITEM_ERRORS } from 'src/common/contents/errors/cart-item.error';
-import { CartItemMapper } from '../mappers';
-import { CreateCartItemDto } from '../dtos';
-import { PrismaService } from 'src/shared/prisma/prisma.service';
-import { ProductService } from 'src/modules/products/services';
-import { ResponseFindMany } from 'src/common/types/respone-find-many.type';
-import { ResponseSuccess } from 'src/common/types';
-import { UserService } from 'src/modules/users/services';
 
 @Injectable()
 export class CartItemService {
@@ -107,6 +106,7 @@ export class CartItemService {
     };
   }
 
+  // Write a function to delete many to handle del many cart items, not rewrite and exclude mapper same below
   deleteMapper(param: CartItemFindByCondition): Prisma.CartItemDeleteManyArgs {
     return this._mapper.deleteByCondition(param);
   }

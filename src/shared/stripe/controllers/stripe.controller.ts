@@ -25,6 +25,7 @@ import { OrderStatus } from 'src/modules/orders/enums';
 import { OK } from 'zod';
 
 @Controller('stripe')
+// Not write controller for this share module
 export class StripeController {
   constructor(
     private readonly _stripeService: StripeService,

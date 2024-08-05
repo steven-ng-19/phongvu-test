@@ -1,18 +1,17 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-
 import { AUTH_ERRORS } from 'src/common/contents/errors/auth.error';
-import { AuthService } from '../services';
+import { UserRole } from 'src/common/enums';
 import { CONFIG_VAR } from 'src/config';
-import { ClerkPayload } from '../types';
 import { ClerkService } from 'src/shared/clerk/clerk.service';
+import { User } from '@clerk/clerk-sdk-node';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Request } from 'express';
-import { User } from '@clerk/clerk-sdk-node';
-import { UserRole } from 'src/common/enums';
-import { join } from 'path';
-import { readFileSync } from 'fs';
+import { AuthService } from '../services';
+import { ClerkPayload } from '../types';
 
 // src/auth/jwt.strategy.ts
 
@@ -30,7 +29,7 @@ export class AdminClerkStategy extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: _configService.getOrThrow(CONFIG_VAR.CLERK_JWT_KEY), // Bạn có thể tùy chỉnh phần này nếu cần
+      secretOrKey: _configService.getOrThrow(CONFIG_VAR.CLERK_JWT_KEY), // NOTE: comment with vietnamese???: Bạn có thể tùy chỉnh phần này nếu cần
     });
   }
 

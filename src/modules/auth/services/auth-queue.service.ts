@@ -1,11 +1,9 @@
-import { DefaultOptions, QueueService } from 'src/shared/queues/queue.service';
 import { MAIL_TEMPLATE, MAIL_TITLE } from 'src/shared/mail/constants';
-
-import { AUTH_QUEUE_PROCESS_NAME } from '../constants';
-import { Injectable } from '@nestjs/common';
-import { JobType } from 'src/common/types';
 import { MailService } from 'src/shared/mail/services';
 import { QUEUE_NAMES } from 'src/shared/queues/constants';
+import { DefaultOptions, QueueService } from 'src/shared/queues/queue.service';
+import { Injectable } from '@nestjs/common';
+import { AUTH_QUEUE_PROCESS_NAME } from '../constants';
 
 @Injectable()
 export class AuthQueueService {

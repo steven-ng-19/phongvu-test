@@ -1,9 +1,8 @@
+import { Gender, UserRole } from 'src/common/enums';
 import * as Zod from 'zod';
 
-import { Gender, UserRole } from 'src/common/enums';
-
 export const roleValues = Object.values(UserRole) as [string, ...string[]];
-export const genderValues = Object.values(Gender) as [string, ...string[]];
+// export const genderValues = Object.values(Gender) as [string, ...string[]];
 export const UserModel = Zod.object({
   id: Zod.string(),
   clerkId: Zod.string(),
@@ -17,7 +16,8 @@ export const UserModel = Zod.object({
   cover: Zod.string().date(),
   role: Zod.enum(roleValues),
   dob: Zod.string().datetime(),
-  gender: Zod.enum(genderValues),
+  // NOTE: Using Zod.nativeEnum()
+  gender: Zod.nativeEnum(Gender),
 
   customerId: Zod.string(),
 

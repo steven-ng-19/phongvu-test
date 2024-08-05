@@ -1,3 +1,7 @@
+import { BaseQueryParamsDto } from 'src/common/dtos';
+import { isArray } from 'src/common/utils';
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { AddressDto, FindAddressDto } from '../dtos';
 import {
   AddressFindByConditionParams,
@@ -7,11 +11,6 @@ import {
   CreateAddressParams,
   UpdateAddressParams,
 } from '../types';
-
-import { BaseQueryParamsDto } from 'src/common/dtos';
-import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { isArray } from 'src/common/utils';
 
 @Injectable()
 export class AddressMapper {
@@ -61,6 +60,7 @@ export class AddressMapper {
         ),
         deletedAt: null,
       },
+      // NOTE: should use select, instead of include
       include: {
         user: true,
       },
