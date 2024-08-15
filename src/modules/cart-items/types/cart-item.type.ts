@@ -27,12 +27,11 @@ export const CartItemManyUniqueKeys = Zod.union([
 export type CartItem = CartItemDto;
 
 export type CartItemPrimaryKey = Pick<CartItem, 'id'>;
-export type CreateCartItemParams = EntityWithoutFields<
-  CartItem,
-  (typeof CREATE_PARAMS_WITHOUT_FIELDS)[number]
+export type CreateCartItemParams = OptionalNullableFields<
+  EntityWithoutFields<CartItem, (typeof CREATE_PARAMS_WITHOUT_FIELDS)[number]>
 >;
 
-export type UpdateCartItemParams = OptionalNullableFields<
+export type UpdateCartItemParams = Partial<
   EntityWithoutFields<CartItem, (typeof CREATE_PARAMS_WITHOUT_FIELDS)[number]>
 >;
 

@@ -34,16 +34,15 @@ export type ProductFindManyPrimaryKeys = Zod.infer<
   typeof ProductManyPrimaryKeys
 >;
 
-export type CreateProductParams = EntityWithoutFields<
-  Product,
-  (typeof CREATE_PARAMS_WITHOUT_FIELDS)[number]
+export type CreateProductParams = OptionalNullableFields<
+  EntityWithoutFields<Product, (typeof CREATE_PARAMS_WITHOUT_FIELDS)[number]>
 >;
 
 const PRODUCT_WITHOUT_FIELDS = [
   ...CREATE_PARAMS_WITHOUT_FIELDS,
   'galleries',
 ] as const;
-export type UpdateProductParams = OptionalNullableFields<
+export type UpdateProductParams = Partial<
   EntityWithoutFields<Product, (typeof UPDATE_PARAMS_WITHOUT_FIELDS)[number]>
 >;
 

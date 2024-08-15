@@ -1,0 +1,15 @@
+model Booking {
+    id              String @id @default(uuid()) @db.VarChar(36)
+    userId          String @default(uuid()) @map("user_id") @db.VarChar(36)
+    repairServiceId String @default(uuid()) @map("repair_service_id") @db.VarChar(36)
+
+    description String @db.Text
+
+    user          User          @relation(references: [id], fields: [userId])
+    repairService RepairService @relation(references: [id], fields: [repairServiceId])
+    createdAt     DateTime      @default(now()) @map("created_at")
+    updatedAt     DateTime      @updatedAt @map("updated_at")
+    deletedAt     DateTime?     @map("deleted_at")
+
+    @@map("bookings")
+}

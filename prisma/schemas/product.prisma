@@ -15,10 +15,11 @@ model Product {
     updatedAt DateTime  @updatedAt @map("updated_at")
     deletedAt DateTime? @map("deleted_at")
 
-    category   Category    @relation(fields: [categoryId], references: [id])
-    galleries  Gallery[]
-    orderItems OrderItem[]
-    cartItems  CartItem[]
+    category       Category        @relation(fields: [categoryId], references: [id])
+    galleries      Gallery[]
+    orderItems     OrderItem[]
+    cartItems      CartItem[]
+    repairServices RepairService[]
 
     @@map("products")
 }

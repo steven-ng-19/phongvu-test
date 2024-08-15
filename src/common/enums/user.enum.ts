@@ -2,6 +2,7 @@ export enum UserRole {
   SUPER_ADMIN = 'super_admin',
   ADMIN = 'admin',
   USER = 'user',
+  REPAIR_PARTNER = 'repair_partner',
 }
 
 export enum UserStatus {

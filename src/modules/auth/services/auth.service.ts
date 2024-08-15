@@ -74,6 +74,8 @@ export class AuthService {
       true,
     );
     if (existedUser) {
+      if (existedUser.role !== UserRole.USER)
+        throw new BadRequestException(AUTH_ERRORS.EMAIL_ALREADY_EXISTS);
       const userData: UpdateUserDto = {
         firstName: clerkUser.firstName ?? existedUser.firstName,
         lastName: clerkUser.lastName ?? existedUser.lastName,
@@ -100,6 +102,49 @@ export class AuthService {
     };
 
     const user = await this._userService.create(userData);
+    return { success: true };
+  }
+
+  async repairPartnerRegister(
+    data: RegisterDto,
+  ): Promise<ResponseSuccess<void>> {
+    const clerkUser = this._verifyToken(data.token, CLERK_JWT_TOKEN);
+    const existedUser = await this._userService.findOne(
+      {
+        clerkId: clerkUser.userId,
+      },
+      true,
+    );
+    if (existedUser) {
+      if (existedUser.role !== UserRole.REPAIR_PARTNER)
+        throw new BadRequestException(AUTH_ERRORS.EMAIL_ALREADY_EXISTS);
+      const userData: UpdateUserDto = {
+        firstName: clerkUser.firstName ?? existedUser.firstName,
+        lastName: clerkUser.lastName ?? existedUser.lastName,
+        avatar: clerkUser.avatar ?? existedUser.avatar,
+      };
+
+      const user = await this._userService.update(
+        { id: existedUser.id },
+        userData,
+      );
+      return { success: true };
+    }
+
+    const userData: CreateUserDto = {
+      clerkId: clerkUser.userId,
+      email: clerkUser.email,
+      firstName: clerkUser.firstName ? clerkUser.firstName : '',
+      lastName: clerkUser.lastName,
+      phone: clerkUser.phone ? clerkUser.phone : '',
+      role: UserRole.USER,
+      gender: Gender.OTHER,
+      userName: clerkUser.userName ? clerkUser.userName : '',
+      avatar: clerkUser.avatar,
+    };
+
+    const user = await this._userService.create(userData);
+
     return { success: true };
   }
 

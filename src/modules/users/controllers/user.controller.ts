@@ -5,7 +5,6 @@ import { RequestUser } from 'src/common/decorators';
 import { ClerkPayload } from 'src/modules/auth/types';
 import { UpdateUserDto, UpdateUserValidator } from '../dtos';
 import { ClerkAuthGuard } from 'src/modules/auth/guards';
-import { ZodValidationPipe } from 'src/common/pipes';
 
 import { Gender } from 'src/common/enums';
 import { UserJSON, UserWebhookEvent } from '@clerk/clerk-sdk-node';

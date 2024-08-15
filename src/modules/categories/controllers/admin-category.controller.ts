@@ -12,7 +12,6 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { CategoryService } from '../services';
-import { ZodValidationPipe } from 'src/common/pipes';
 import {
   CategoryDto,
   CreateCategoryDto,
@@ -32,14 +31,16 @@ import { ResponseService } from 'src/shared/response/response.service';
 import { Request } from 'express';
 import { generateSlug } from 'src/common/utils';
 import { Prisma } from '@prisma/client';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @Controller('admin/categories')
 export class AdminCategoryController {
   constructor(private readonly _categoryService: CategoryService) {}
 
   @Post()
+  @UsePipes(ZodValidationPipe)
   async create(
-    @Body(new ZodValidationPipe(CreateCategoryValidator))
+    @Body()
     payload: CreateCategoryDto,
   ) {
     const data: CreateCategoryParams = {
@@ -50,9 +51,10 @@ export class AdminCategoryController {
   }
 
   @Patch(':id')
+  @UsePipes(ZodValidationPipe)
   async update(
     @Param('id') id: CategoryPrimaryKey,
-    @Body(new ZodValidationPipe(UpdateCategoryValidator))
+    @Body()
     payload: UpdateCategoryDto,
   ) {
     const data: UpdateCategoryParams = {

@@ -19,10 +19,12 @@ model User {
     updatedAt DateTime  @updatedAt @map("updated_at")
     deletedAt DateTime? @map("deleted_at")
 
-    addresses Address[]
-    cartItems CartItem[]
-    orders    Order[]
-    card      Card[]
+    addresses     Address[]
+    cartItems     CartItem[]
+    orders        Order[]
+    card          Card[]
+    bookings      Booking[]
+    repairPartner RepairPartner?
 
     @@map("users")
 }

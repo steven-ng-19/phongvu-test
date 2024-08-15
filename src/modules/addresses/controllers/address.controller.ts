@@ -20,7 +20,6 @@ import {
   CreateAddressValidator,
   FindAddressDto,
 } from '../dtos';
-import { ZodValidationPipe } from 'src/common/pipes';
 import { ApiPaginateResponse } from 'src/shared/response/dtos';
 import { Request } from 'express';
 import { ResponseService } from 'src/shared/response/response.service';
@@ -28,8 +27,8 @@ import { ADDRESS_FILTER_FIELD } from '../constants';
 import { ClerkAuthGuard } from 'src/modules/auth/guards';
 import { RequestUser } from 'src/common/decorators';
 import { ClerkPayload } from 'src/modules/auth/types';
-import { AddressKeys } from '../entities';
 import { Address } from '../types';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @Controller('addresses')
 export class AddressController {
@@ -69,9 +68,10 @@ export class AddressController {
 
   @Post()
   @UseGuards(ClerkAuthGuard)
+  @UsePipes(ZodValidationPipe)
   async create(
     @RequestUser() user: ClerkPayload,
-    @Body(new ZodValidationPipe(CreateAddressValidator)) data: CreateAddressDto,
+    @Body() data: CreateAddressDto,
   ) {
     return this._addressService.create(data, user.localId);
   }

@@ -1,0 +1,18 @@
+model RepairService {
+    id              String @id @default(uuid()) @db.VarChar(36)
+    productId       String @map("product_id") @db.VarChar(36)
+    repairPartnerId String @map("repair_partner_id") @db.VarChar(36)
+
+    name        String @db.VarChar(200)
+    price       Float
+    description String @db.Text
+
+    product       Product       @relation(references: [id], fields: [productId])
+    repairPartner RepairPartner @relation(references: [id], fields: [repairPartnerId])
+    bookings      Booking[]
+    createdAt     DateTime      @default(now()) @map("created_at")
+    updatedAt     DateTime      @updatedAt @map("updated_at")
+    deletedAt     DateTime?     @map("deleted_at")
+
+    @@map("repair_services")
+}

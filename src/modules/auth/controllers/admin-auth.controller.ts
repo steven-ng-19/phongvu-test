@@ -4,7 +4,6 @@ import { RefreshTokenDto, RefreshTokenValidator } from '../dtos';
 import { AuthService } from '../services';
 import { RequestUser } from 'src/common/decorators';
 import { User } from '@prisma/client';
-import { ZodValidationPipe } from 'src/common/pipes';
 import { ClerkAuthGuard } from '../guards';
 import { ClerkPayload } from '../types';
 

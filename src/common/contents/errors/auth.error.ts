@@ -19,4 +19,8 @@ export const AUTH_ERRORS = {
     code: 'Not Permission',
     message: 'You do not have permission',
   },
+  EMAIL_ALREADY_EXISTS: {
+    code: 'Email Already Exists',
+    message: 'Email already exists. Please choose another email',
+  },
 };

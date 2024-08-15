@@ -49,6 +49,22 @@ model Benefit {
   @@map("benefits")
 }
 
+model Booking {
+  id              String @id @default(uuid()) @db.VarChar(36)
+  userId          String @default(uuid()) @map("user_id") @db.VarChar(36)
+  repairServiceId String @default(uuid()) @map("repair_service_id") @db.VarChar(36)
+
+  description String @db.Text
+
+  user          User          @relation(references: [id], fields: [userId])
+  repairService RepairService @relation(references: [id], fields: [repairServiceId])
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  deletedAt     DateTime?     @map("deleted_at")
+
+  @@map("bookings")
+}
+
 model Card {
   id     String @id @default(uuid()) @db.VarChar(36)
   userId String @map("user_id") @db.VarChar(36)
@@ -231,10 +247,11 @@ model Product {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  category   Category    @relation(fields: [categoryId], references: [id])
-  galleries  Gallery[]
-  orderItems OrderItem[]
-  cartItems  CartItem[]
+  category       Category        @relation(fields: [categoryId], references: [id])
+  galleries      Gallery[]
+  orderItems     OrderItem[]
+  cartItems      CartItem[]
+  repairServices RepairService[]
 
   @@map("products")
 }
@@ -259,6 +276,55 @@ model Promotion {
   @@map("promotions")
 }
 
+model RepairPartner {
+  id              String @id @default(uuid()) @db.VarChar(36)
+  userId          String @unique @map("user_id") @db.VarChar(36)
+  stripeAccountId String @map("stripe_account_id")
+
+  bussinessType    String    @map("bussiness_type") @db.VarChar(20)
+  companyIndustry  String    @default("Consulting services") @map("company_industry") @db.VarChar(100)
+  bussinessWebSite String?   @map("bussiness_website") @db.VarChar(200)
+  firstName        String    @map("first_name") @db.VarChar(100)
+  lastName         String    @map("last_name") @db.VarChar(100)
+  email            String    @db.VarChar(100)
+  dob              DateTime?
+  country          String?   @db.VarChar(200)
+  addressLine1     String?   @map("address_line1") @db.VarChar(255)
+  addressLine2     String?   @map("address_line2") @db.VarChar(255)
+  city             String?   @db.VarChar(255)
+  state            String?   @db.VarChar(200)
+  postalCode       String?   @map("postal_code") @db.VarChar(200)
+  phoneNumber      String?   @map("phone_number") @db.VarChar(20)
+  bankAccountId    String?   @map("bank_account_id")
+
+  repairServices RepairService[]
+  user           User            @relation(references: [id], fields: [userId])
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  deletedAt      DateTime?       @map("deleted_at")
+
+  @@map("repair_partner")
+}
+
+model RepairService {
+  id              String @id @default(uuid()) @db.VarChar(36)
+  productId       String @map("product_id") @db.VarChar(36)
+  repairPartnerId String @map("repair_partner_id") @db.VarChar(36)
+
+  name        String @db.VarChar(200)
+  price       Float
+  description String @db.Text
+
+  product       Product       @relation(references: [id], fields: [productId])
+  repairPartner RepairPartner @relation(references: [id], fields: [repairPartnerId])
+  bookings      Booking[]
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  deletedAt     DateTime?     @map("deleted_at")
+
+  @@map("repair_services")
+}
+
 model User {
   id      String @id @default(uuid()) @db.VarChar(36)
   clerkId String @map("clerk_id") @db.Text
@@ -280,10 +346,12 @@ model User {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  addresses Address[]
-  cartItems CartItem[]
-  orders    Order[]
-  card      Card[]
+  addresses     Address[]
+  cartItems     CartItem[]
+  orders        Order[]
+  card          Card[]
+  bookings      Booking[]
+  repairPartner RepairPartner?
 
   @@map("users")
 }

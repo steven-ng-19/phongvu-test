@@ -121,4 +121,100 @@ export class StripeService {
   async retrieveCharge(chargeId: string): Promise<Stripe.Charge> {
     return this.stripe.charges.retrieve(chargeId);
   }
+
+  async createAccount(): Promise<Stripe.Account> {
+    return this.stripe.accounts.create({
+      business_type: 'individual',
+      individual: {
+        first_name: 'Jenny',
+        last_name: 'Rosen',
+        dob: {
+          day: 13,
+          month: 4,
+          year: 1970,
+        },
+      },
+      type: 'custom',
+      capabilities: {
+        card_payments: { requested: true },
+        transfers: { requested: true },
+      },
+      email: 'NnVQz@example.com',
+    });
+  }
+
+  async createBankAccount(accountId: string): Promise<Stripe.ExternalAccount> {
+    const bankAccount = await this.stripe.accounts.createExternalAccount(
+      accountId,
+      {
+        external_account: {
+          account_number: '000123456',
+          object: 'bank_account',
+          country: 'SG',
+          currency: 'sgd',
+          account_holder_name: 'Jenny Rosen',
+          account_holder_type: 'individual',
+          routing_number: '7171-001',
+        },
+      },
+    );
+    return bankAccount;
+  }
+
+  async updateAccount(accountId: string): Promise<Stripe.Account> {
+    return this.stripe.accounts.update(accountId, {
+      business_profile: {
+        url: 'https://accessible.stripe.com',
+      },
+      individual: {
+        id_number: '000000000',
+        email: 'NnVQz@example.com',
+        phone: '+65 6123 4567',
+        address: {
+          line1: 'address_full_match',
+          country: 'SG',
+        },
+        verification: {
+          document: {
+            front: 'file_identity_document_success',
+            // back: 'file_identity_document_success',
+          },
+        },
+        full_name_aliases: ['Jenny Rosen'],
+        dob: {
+          day: 1,
+          month: 1,
+          year: 1900,
+        },
+        registered_address: {
+          line1: 'address_full_match',
+        },
+      },
+      tos_acceptance: {
+        date: 1609798905,
+        ip: '8.8.8.8',
+      },
+    });
+  }
+
+  async createAccountLink(id: string): Promise<Stripe.AccountLink> {
+    return this.stripe.accountLinks.create({
+      account: id,
+      refresh_url: 'https://example.com/reauth',
+      return_url: 'https://example.com/return',
+      type: 'account_onboarding',
+    });
+  }
+
+  async connectAccount(id: string): Promise<Stripe.Account> {
+    return this.stripe.accounts.retrieve(id, {
+      stripeAccount: id,
+    });
+  }
+
+  async updatePerson(id: string, personId: string): Promise<Stripe.Person> {
+    return await this.stripe.accounts.updatePerson(id, personId, {
+      nationality: 'SG',
+    });
+  }
 }

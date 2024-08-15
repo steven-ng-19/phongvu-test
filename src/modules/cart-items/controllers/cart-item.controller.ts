@@ -27,7 +27,7 @@ import {
   CreateCartItemValidator,
   UpdateCartItemValidator,
 } from '../dtos';
-import { ZodValidationPipe } from 'src/common/pipes';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @Controller('cart-items')
 export class CartItemController {
@@ -65,20 +65,22 @@ export class CartItemController {
 
   @Post()
   @UseGuards(ClerkAuthGuard)
+  @UsePipes(ZodValidationPipe)
   async create(
     @RequestUser() user: ClerkPayload,
-    @Body(new ZodValidationPipe(CreateCartItemValidator))
+    @Body()
     data: CreateCartItemDto,
   ) {
     return this._cartItemService.create(data, user.localId);
   }
 
   @Patch(':id')
+  @UsePipes(ZodValidationPipe)
   @UseGuards(ClerkAuthGuard)
   async update(
     @RequestUser() user: ClerkPayload,
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(UpdateCartItemValidator))
+    @Body()
     data: CreateCartItemDto,
   ) {
     return this._cartItemService.update({ id }, data, user.localId);

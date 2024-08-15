@@ -29,12 +29,11 @@ const CATEGORY_WITHOUT_FIELDS = [
   'isDeprecated',
 ] as const;
 
-export type CreateCategoryParams = EntityWithoutFields<
-  Category,
-  (typeof CATEGORY_WITHOUT_FIELDS)[number]
+export type CreateCategoryParams = OptionalNullableFields<
+  EntityWithoutFields<Category, (typeof CATEGORY_WITHOUT_FIELDS)[number]>
 >;
 
-export type UpdateCategoryParams = OptionalNullableFields<
+export type UpdateCategoryParams = Partial<
   EntityWithoutFields<Category, (typeof UPDATE_PARAMS_WITHOUT_FIELDS)[number]>
 >;
 

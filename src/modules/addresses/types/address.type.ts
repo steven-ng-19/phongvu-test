@@ -34,12 +34,11 @@ export type Address = AddressDto;
 export type FindAddress = FindAddressDto;
 
 export type AddressPrimaryKey = Pick<Address, 'id'>;
-export type CreateAddressParams = EntityWithoutFields<
-  Address,
-  (typeof CREATE_ADDRESS_WITHOUT_FIELDS)[number]
+export type CreateAddressParams = OptionalNullableFields<
+  EntityWithoutFields<Address, (typeof CREATE_ADDRESS_WITHOUT_FIELDS)[number]>
 >;
 
-export type UpdateAddressParams = OptionalNullableFields<
+export type UpdateAddressParams = Partial<
   EntityWithoutFields<Address, (typeof UPDATE_ADDRESS_WITHOUT_FIELDS)[number]>
 >;
 

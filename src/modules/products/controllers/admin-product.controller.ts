@@ -12,7 +12,6 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ProductService } from '../services';
-import { ZodValidationPipe } from 'src/common/pipes';
 import {
   CreateProductDto,
   CreateProductValidator,
@@ -28,14 +27,16 @@ import { DirectFilterPipe } from '@chax-at/prisma-filter';
 import { PRODUCT_FILTER_FIELD } from '../constants';
 import { ResponseService } from 'src/shared/response/response.service';
 import { Prisma } from '@prisma/client';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @Controller('admin/products')
 export class AdminProductController {
   constructor(private readonly _productService: ProductService) {}
 
   @Post()
+  @UsePipes(ZodValidationPipe)
   async createProduct(
-    @Body(new ZodValidationPipe(CreateProductValidator))
+    @Body()
     payload: CreateProductDto,
   ) {
     const data: CreateProductParams = {
@@ -46,9 +47,10 @@ export class AdminProductController {
   }
 
   @Patch(':id')
+  @UsePipes(ZodValidationPipe)
   async updateProduct(
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(UpdateProductValidator))
+    @Body()
     payload: UpdateProductDto,
   ) {
     const data: UpdateProductParams = {

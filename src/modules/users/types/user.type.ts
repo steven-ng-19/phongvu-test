@@ -31,16 +31,15 @@ export type UserRelation = UserRelatedDto;
 
 export type UserPrimaryKey = Pick<User, 'id'>;
 
-export type CreateUserParams = EntityWithoutFields<
-  User,
-  (typeof CREATE_PARAMS_WITHOUT_FIELDS)[number]
+export type CreateUserParams = OptionalNullableFields<
+  EntityWithoutFields<User, (typeof CREATE_PARAMS_WITHOUT_FIELDS)[number]>
 >;
 
 const ADDRESS_PARAMS_WITHOUT_FIELDS = [
   ...UPDATE_PARAMS_WITHOUT_FIELDS,
   'clerkId',
 ] as const;
-export type UpdateUserParams = OptionalNullableFields<
+export type UpdateUserParams = Partial<
   EntityWithoutFields<User, (typeof ADDRESS_PARAMS_WITHOUT_FIELDS)[number]>
 >;
 

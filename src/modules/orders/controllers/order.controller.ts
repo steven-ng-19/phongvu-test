@@ -14,7 +14,6 @@ import { RequestUser } from 'src/common/decorators';
 import { ClerkPayload } from 'src/modules/auth/types';
 import { ClerkAuthGuard } from 'src/modules/auth/guards';
 import { CreateOrderDto, CreateOrderValidator, OrderDto } from '../dtos';
-import { ZodValidationPipe } from 'src/common/pipes';
 import { DirectFilterPipe } from '@chax-at/prisma-filter';
 import { ORDER_FILTER_FIELDS } from '../constants';
 import { BaseQueryParamsDto } from 'src/common/dtos';
@@ -23,6 +22,7 @@ import { ResponseService } from 'src/shared/response/response.service';
 import { ApiPaginateResponse } from 'src/shared/response/dtos';
 import { Request } from 'express';
 import { OrderFindByConditionParams } from '../types';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @Controller('orders')
 export class OrderController {
@@ -30,9 +30,10 @@ export class OrderController {
 
   @Post()
   @UseGuards(ClerkAuthGuard)
+  @UsePipes(ZodValidationPipe)
   async create(
     @RequestUser() user: ClerkPayload,
-    @Body(new ZodValidationPipe(CreateOrderValidator)) data: CreateOrderDto,
+    @Body() data: CreateOrderDto,
   ) {
     return this._orderService.create(data, user.localId);
   }

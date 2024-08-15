@@ -1,7 +1,14 @@
-import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
 
 import { AuthService } from '../services';
-import { ZodValidationPipe } from 'src/common/pipes';
 import {
   ForgotPasswordDto,
   ForgotPasswordValidator,
@@ -16,6 +23,7 @@ import { ClerkAuthGuard, LocalAuthGuard, UserJwtAccessGuard } from '../guards';
 import { ClerkService } from 'src/shared/clerk/clerk.service';
 import { ClerkPayload } from '../types';
 import { UpdateUserDto } from 'src/modules/users/dtos';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @Controller('auth')
 export class AuthController {
@@ -25,9 +33,8 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  async register(
-    @Body(new ZodValidationPipe(RegisterValidator)) payload: RegisterDto,
-  ) {
+  @UsePipes(ZodValidationPipe)
+  async register(@Body() payload: RegisterDto) {
     return await this._authService.register(payload);
   }
 

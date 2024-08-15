@@ -37,12 +37,11 @@ const FIND_PARAM_WITHOUT_FIELDS = [
   'paymentDetails',
 ] as const;
 
-export type CreateOrderParams = EntityWithoutFields<
-  Order,
-  (typeof CREATE_PARAMS_WITHOUT_FIELDS)[number]
+export type CreateOrderParams = OptionalNullableFields<
+  EntityWithoutFields<Order, (typeof CREATE_PARAMS_WITHOUT_FIELDS)[number]>
 >;
 
-export type UpdateOrderParams = OptionalNullableFields<
+export type UpdateOrderParams = Partial<
   EntityWithoutFields<
     OrderDto,
     (typeof UPDATE_ORDER_PARAM_WITHOUT_FIELDS)[number]
